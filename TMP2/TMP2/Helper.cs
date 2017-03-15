@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using System.Linq;
 
 namespace DotsAndBoxesFun
 {
@@ -10,6 +11,7 @@ namespace DotsAndBoxesFun
         public static Color compColor = Color.FromHex("#D13A1B");
         public static Color playerColor = Color.FromHex("#12B504");
         public static Color compPrevColor = Color.FromHex("#DBB312");
+        public static Dictionary<int, House> HouseDict = new Dictionary<int, House>();
 
         public static bool IsFilled(this BoxView shape)
         {
@@ -25,9 +27,114 @@ namespace DotsAndBoxesFun
 
     public class House
     {
+        public Dictionary<string, Edge> shapeDict { get; set; } = new Dictionary<string, Edge>();
+        private int count = 0;
+
+        public House(int boardSize)
+        {
+            count = boardSize;
+        }
+
+        public int Id { get; set; }
         public Xamarin.Forms.BoxView Grid { get; set; }
         public string Text { get; set; }
         public int FilledCount { get; set; }
+
+        public House LeftHouse
+        {
+            get
+            {
+                return Id % count == 1 ? null : Constants.HouseDict[Id - 1];
+            }
+        }
+
+        public House RightHouse
+        {
+            get
+            {
+                return Id % count == 0 ? null : Constants.HouseDict[Id + 1];
+            }
+        }
+
+        public House UpHouse
+        {
+            get
+            {
+                return Id - count > 0 ? Constants.HouseDict[Id - count] : null;
+            }
+        }
+
+        public House DownHouse
+        {
+            get
+            {
+                return Id + count > count * count ? null : Constants.HouseDict[Id + count];
+            }
+        }
+
+        public Edge TopEdge
+        {
+            get
+            {
+                if (4 * (Id - count) - 1 < 0)
+                    return GetValue($"_{4 * Id - 3}");
+                return GetValue($"_{4*(Id - count) - 1}_{4*Id - 3}");
+            }
+        }
+
+        private Edge GetValue(string id)
+        {
+            return shapeDict.Values.Where(x => x.Name == id).FirstOrDefault();
+        }
+        public Edge DownEdge
+        {
+            get
+            {
+                if (4 * (Id + count) - 3 > (4*count*count))
+                    return GetValue($"_{4 * Id - 1}");
+                return GetValue($"_{4 * Id - 1}_{4 * (Id + count) - 3}");
+            }
+        }
+        public Edge LeftEdge
+        {
+            get
+            {
+                if (Id % count == 1)
+                    return GetValue($"_{4 * Id}");
+                return GetValue($"_{4 * Id - 6}_{4 * Id}");
+            }
+        }
+        public Edge RightEdge
+        {
+            get
+            {
+                if (Id % count == 0)
+                    return GetValue($"_{4 * Id - 2}");
+                return GetValue($"_{4 * Id - 2}_{4 * (Id + 1)}");
+            }
+        }
+
+        public List<Edge> Edges
+        {
+            get
+            {
+                return new List<Edge>
+                {
+                    TopEdge, RightEdge, DownEdge, LeftEdge
+                };
+            }
+        }
+
+        public List<House> NeighbourHouses
+        {
+            get
+            {
+                return new List<House>
+                {
+                    UpHouse, RightHouse, DownHouse, LeftHouse
+                };
+            }
+        }
     }
 
     public class Edge
@@ -45,4 +152,82 @@ namespace DotsAndBoxesFun
             }
         }
     }
+
+    public class ChainManager
+    {
+        public List<Chain> ChainList { get; set; } = new List<Chain>();
+
+        public int ChainCount { get { return ChainList.Count; } }
+
+        public Chain GetChain(House house, out House matchingNeighbour)
+        {
+            matchingNeighbour = null;
+            if (house == null) return null;
+            foreach (var neighbour in house.NeighbourHouses)
+            {
+                if (neighbour == null) continue;
+                foreach (var chain in ChainList)
+                {
+                    foreach (var box in chain.BoxList)
+                    {
+                        if (box.Id == neighbour.Id)
+                        {
+                            var edge = GetConnectingEdge(box, house);
+                            if (edge != null && !edge.IsFilled)
+                            {
+                                matchingNeighbour = neighbour;
+                                return chain;
+                            }
+                        }
+                    }
+                }
+                if (neighbour.FilledCount == 2)
+                {
+                    var chain = new Chain();
+                    chain.BoxList.Add(neighbour);
+                    ChainList.Add(chain);
+                }
+            }            
+            return null;
+        }
+
+        private Edge GetConnectingEdge(House house1, House house2)
+        {
+            foreach (var edge1 in house1.Edges)
+            {
+                foreach (var edge2 in house2.Edges)
+                {
+                    if (edge1.Name == edge2.Name)
+                        return edge1;
+                }
+            }
+            return null;
+        }
+
+        public void AddChain(House house)
+        {
+            var chain = new Chain();
+            chain.BoxList.Add(house);
+            ChainList.Add(chain);
+        }
+    }
+
+    public class Chain
+    {
+        public Chain()
+        {
+
+        }
+        public Chain(List<House> houses)
+        {
+            BoxList.AddRange(houses);
+        }
+        public List<House> BoxList { get; set; } = new List<House>();
+
+        public int Count { get { return BoxList.Count; } }
+
+        public ChainType Type { get; set; } = ChainType.Open;
+    }
+
+    public enum ChainType { Open, Ready};
 }

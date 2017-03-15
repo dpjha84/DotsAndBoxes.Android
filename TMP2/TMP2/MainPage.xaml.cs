@@ -1,372 +1,226 @@
-﻿using System;
+﻿using DotsAndBoxesFun.Views;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace DotsAndBoxesFun
 {
-    public partial class MainPage : ContentPage
+    public enum DifficulyLevel
     {
-        Turn turn = Turn.Player1;
-        int player1Score = 0;
-        int player2Score = 0;
-        private static Color vertexColor = Color.FromHex("#0A4008");
-        private static Color edgeDefaultColor = Color.FromHex("#FAEDF0");
-        private static Color edgeHoverColor = Color.FromHex("#6CCBE6");
-        int count = 5;
-        const string player1Sound = "cool1.mp3";
-        const string player2Sound = "cool2.mp3";
-        Dictionary<string, Edge> shapeDict = new Dictionary<string, Edge>();
-        Dictionary<int, House> houseDict = new Dictionary<int, House>();
-        int houseCount = 0;
-        Random rnd = new Random();
-        BoxView prevCompRect;
-        static object lockObject = new object();
-        int[,] moveArray = new int[,]
-        {
-            {3, 3, 3},
-            {3, 2, 3},
-            {3, 0, 3},
-            {3, 1, 3},
-            {0, 0, 0},
-            {0, 1, 0},
-            {1, 1, 1},
-            {2, 0, 0},
-            {2, 1, 1},
-            {2, 2, 2}
-        };
+        Easy, Medium, Hard
+    };
 
+    public partial class MainPage : MasterDetailPage
+    {
+        public ObservableCollection<MasterPageItem> menuList { get; set; }
+        Entry entry = new Entry();
+
+        int currentBoardSize = 6;
+        bool currentFirstMove = false;
+        DifficulyLevel currentDifficulyLevel = DifficulyLevel.Hard;
         public MainPage()
         {
-            this.InitializeComponent();
-            grid.SizeChanged += (object sender, EventArgs e) =>
-            {
-                grid.HeightRequest = grid.Width;
-            };
-            grid.ColumnSpacing = 3;
-            grid.RowSpacing = 3;
-            textPlayer1Score.TextColor = Constants.playerColor;
-            textPlayer2Score.TextColor = Constants.compColor;
-            separator1.HeightRequest = 1;
-            separator1.BackgroundColor = Color.Black;
-            separator1.VerticalOptions = LayoutOptions.Start;
-            separator2.HeightRequest = 1;
-            separator2.BackgroundColor = Color.Black;
-            separator2.VerticalOptions = LayoutOptions.Start;
-            NewGame();
+            InitializeComponent();
+
+            entry.Placeholder = "Settings saved. Hit New Game to play with new settings.";
+            entry.HorizontalOptions = LayoutOptions.Center;
+
+            menuList = new ObservableCollection<MasterPageItem>();
+
+            // Creating our pages for menu navigation
+            // Here you can define title for item, 
+            // icon on the left side, and page that you want to open after selection
+            //var page1 = new MasterPageItem() { Title = "Item 1", Icon = "itemIcon1.png", TargetType = typeof(Test1) };
+            BuildMenu();
+
+            // Setting our list to be ItemSource for ListView in MainPage.xaml
+            navigationDrawerList.ItemsSource = menuList;
+
+            // Initial navigation, this can be used for our home page
+            Detail = new NavigationPage((Page)Activator.CreateInstance(typeof(Test1)));
         }
 
-        Turn GetTurn()
+        private void BuildMenu()
         {
-            lock (lockObject)
-            {
-                return turn;
-            }
+            var page1 = new MasterPageItem() { Id = 1, Title = "New Game", Icon = "itemIcon5.png" };
+            var page2 = new MasterPageItem() { Id = 2, Title = "Board size", Icon = "itemIcon2.png", CurrentValue = "6x6" };
+            var page3 = new MasterPageItem() { Id = 3, Title = "Difficulty level", Icon = "itemIcon3.png", CurrentValue = "Medium" };
+            var page4= new MasterPageItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png", CurrentValue = "You" };
+
+            menuList.Add(page1);
+            menuList.Add(page2);
+            menuList.Add(page3);
+            menuList.Add(page4);
         }
 
-        void SetTurn(Turn t)
+        private void RebuildMenu(int id, string newValue)
         {
-            lock (lockObject)
-            {
-                turn = t;
-            }
+            MasterPageItem page1, page2, page3, page4;
+            page1 = new MasterPageItem() { Id = 1, Title = "New Game", Icon = "itemIcon5.png" };
+            page2 = new MasterPageItem() { Id = 2, Title = "Board size", Icon = "itemIcon2.png", CurrentValue = menuList[1].CurrentValue };
+            page3 = new MasterPageItem() { Id = 3, Title = "Difficulty level", Icon = "itemIcon3.png", CurrentValue = menuList[2].CurrentValue };
+            page4 = new MasterPageItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png",CurrentValue = menuList[3].CurrentValue };
+
+            if (id == 2)
+                page2.CurrentValue = newValue;
+            else if (id == 3)
+                page3.CurrentValue = newValue;
+            else if (id == 4)
+                page4.CurrentValue = newValue;
+
+            menuList.Clear();
+
+            menuList.Add(page1);
+            menuList.Add(page2);
+            menuList.Add(page3);
+            menuList.Add(page4);
         }
 
-        public void NewGame()
+        private string[] GetButtons(int menuId)
         {
-            ShowScore();
-            for (int i = 0; i < count * 2 + 1; i++)
+            if (menuId == 1)
             {
-                int count = i % 2 == 0 ? 1 : 3;
-                var rd = new Xamarin.Forms.RowDefinition() { Height = new GridLength(count, GridUnitType.Star) };
-                var cd = new Xamarin.Forms.ColumnDefinition() { Width = new GridLength(count, GridUnitType.Star) };
-                grid.RowDefinitions.Add(rd);
-                grid.ColumnDefinitions.Add(cd);
-            }
-
-            Xamarin.Forms.BoxView shape;
-            string id = "";
-            int last = count * 2 + 1;
-            for (int i = 0; i < last; i++)
-            {
-                bool start = true;
-                for (int j = 0; j < last; j++)
+                string[] buttons = new string[5];
+                int b = 0;
+                for (int i = 5; i <= 9; i++)
                 {
-                    if ((i + j) % 2 == 0)
-                    {
-                        shape = new Xamarin.Forms.BoxView() { BackgroundColor = vertexColor };
-                        Xamarin.Forms.Grid.SetRow(shape, i);
-                        Xamarin.Forms.Grid.SetColumn(shape, j);
-                        grid.Children.Add(shape);
-                        if (j % 2 != 0)
-                        {
-                            shape.BackgroundColor = edgeDefaultColor;
-                            houseDict.Add(++houseCount, new House() { Grid = shape });
-                        }
-                        else
-                            shape.ClassId = string.Format("vertex{0}{1}", i, j);
-                        continue;
-                    }
-                    if (start)
-                    {
-                        if (i < last - 1)
-                        {
-                            if (i % 2 == 0)
-                                id = ((i / 2) * (4 * count) + j).ToString();
-                            else
-                                id = ((i / 2) * (4 * count) + 4).ToString();
-                        }
-                        else
-                            id = id = (((i - 1) / 2) * (4 * count) + 3).ToString();
-                        start = false;
-                    }
-                    else
-                    {
-                        var splitted = id.Split('_');
-                        id = (Convert.ToInt32(splitted[splitted.Length - 1]) + 4).ToString();
-                    }
-                    if (i > 0 && j > 0 && i < last - 1)
-                    {
-                        if (j < last - 1)
-                        {
-                            if (i % 2 != 0)
-                                id = (Convert.ToInt32(id) - 6).ToString() + "_" + id;
-                            else
-                                id = (Convert.ToInt32(id) - (4 * count - 2)).ToString() + "_" + id;
-                        }
-                        else
-                            id = (Convert.ToInt32(id) - 6).ToString();
-                    }
-                    shape = new Xamarin.Forms.BoxView()
-                    {
-                        BackgroundColor = edgeDefaultColor
-                    };
-                    shape.ClassId = "_" + id;
-                    var ids = id.Split('_');
-                    foreach (var item in ids)
-                    {
-                        var edge = new Edge() { Shape = shape, Name = shape.ClassId };
-                        shapeDict.Add(item, edge);
-                    }
-                    var tabGestureOrganiser = new TapGestureRecognizer();
-                    tabGestureOrganiser.Tapped += EdgeClicked;
-                    shape.GestureRecognizers.Add(tabGestureOrganiser);
-                    Xamarin.Forms.Grid.SetRow(shape, i);
-                    Xamarin.Forms.Grid.SetColumn(shape, j);
-                    grid.Children.Add(shape);
+                    buttons[b++] = (currentBoardSize == i) ? $"» {i}x{i}" : $"  {i}x{i}";
                 }
+                return buttons;
             }
-            MapHousesToEdges();
-        }
-
-        private void MapHousesToEdges()
-        {
-            foreach (var edge in shapeDict)
+            else if (menuId == 2)
             {
-                string[] splitted = edge.Value.Name.Substring(1).Split('_');
-                int houseId = (int)Math.Ceiling(Convert.ToDouble(splitted[0]) / 4);
-                edge.Value.House1 = houseDict[houseId];
-                if (splitted.Length > 1)
+                string[] buttons = new string[3];
+                int b = 0;
+                foreach (var level in Enum.GetValues(typeof(DifficulyLevel)))
                 {
-                    houseId = (int)Math.Ceiling(Convert.ToDouble(splitted[1]) / 4);
-                    edge.Value.House2 = houseDict[houseId];
+                    buttons[b++] = (currentDifficulyLevel == (DifficulyLevel)level) ? $"» {level}" : $"  {level}";
                 }
-            }
-        }
-
-        async void PlaySound(string fileName)
-        {
-            //MediaElement mysong = new MediaElement();
-            //Windows.Storage.StorageFolder folder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
-            //Windows.Storage.StorageFile file = await folder.GetFileAsync(fileName);
-            //var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
-            //mysong.SetSource(stream, file.ContentType);
-            //mysong.Play();
-        }
-
-        async Task CompMove()
-        {
-            ShowScore();
-            await GetEdge();
-            SetTurn(Turn.Player1);
-        }
-
-        private void ShowScore()
-        {
-            if (GetTurn() == Turn.Player1)
-            {
-                textPlayer1Score.Text = player1Score.ToString() + "*";
-                textPlayer2Score.Text = player2Score.ToString();
+                return buttons;
             }
             else
             {
-                textPlayer2Score.Text = player2Score.ToString() + "*";
-                textPlayer1Score.Text = player1Score.ToString();
-            }
-        }
-
-        private async void CheckIfGameIsOver()
-        {
-            bool end = true;
-            foreach (var item in shapeDict)
-            {
-                if (item.Value.Shape.BackgroundColor == edgeDefaultColor)
+                string[] buttons1 = new string[2];
+                for (int i = 0; i <= 1; i++)
                 {
-                    end = false;
-                    break;
+                    buttons1[i++] = !currentFirstMove == true ? "» You" : $"  CPU";
                 }
-            }
-            if (end)
-            {
-                prevCompRect.BackgroundColor = Constants.compColor;
-                if (player1Score == player2Score)
-                    DisplayAlert("Game over!", "It is tied", "OK");
-                else
-                    DisplayAlert("Game over!", player1Score > player2Score ? "You won!!!" : "You lost!!!", "OK");
-            }
-        }
-
-        async Task GetEdge()
-        {
-            await Task.Delay(500);
-            PlaySound(player2Sound);
-            SetTurn(Turn.Player2);
-            ShowScore();
-            List<Edge> list;
-            for (int i = 0; i < moveArray.GetLength(0); i++)
-            {
-                list = GetList(moveArray[i, 0], moveArray[i, 1], moveArray[i, 2]);
-                if (list.Count > 0)
+                if (!currentFirstMove)
                 {
-                    UpdateEdge(list[rnd.Next(0, list.Count - 1)]);
-                    return;
-                }
-            }
-        }
-
-        private List<Edge> GetList(int house1FilledCount, int house2FilledCount, int preferenceCount)
-        {
-            List<Edge> list = new List<Edge>();
-            foreach (var item in shapeDict)
-            {
-                if (item.Value.IsFilled)
-                    continue;
-                if (item.Value.House2 == null)
-                {
-                    if (item.Value.House1.FilledCount == preferenceCount)
-                        list.Add(item.Value);
+                    buttons1[0] = "» You";
+                    buttons1[1] = "  CPU";
                 }
                 else
                 {
-                    if ((item.Value.House1.FilledCount == house1FilledCount && item.Value.House2.FilledCount == house2FilledCount) ||
-                        (item.Value.House1.FilledCount == house2FilledCount && item.Value.House2.FilledCount == house1FilledCount))
-                        list.Add(item.Value);
+                    buttons1[0] = "  You";
+                    buttons1[1] = "» CPU";
                 }
+                return buttons1;
             }
-            return list;
-        }
+        } 
 
-        private void UpdateEdge(Edge edge)
-        {
-            if (prevCompRect != null)
-                prevCompRect.BackgroundColor = Constants.compColor;
-            edge.House1.FilledCount++;
-            prevCompRect = edge.Shape;
-
-            edge.Shape.BackgroundColor = Constants.compColor;
-            //edge.Shape = 5;
-            if (edge.House2 != null)
-                edge.House2.FilledCount++;
-            bool houseMade = false;
-            if (edge.House1.FilledCount == 4)
-            {
-                player2Score++;
-                edge.House1.Grid.BackgroundColor = Constants.compColor;
-                houseMade = true;
-            }
-            if (edge.House2 != null && edge.House2.FilledCount == 4)
-            {
-                player2Score++;
-                edge.House2.Grid.BackgroundColor = Constants.compColor;
-                houseMade = true;
-            }
-            if (houseMade)
-            {
-                edge.Shape.BackgroundColor = Constants.compColor;
-                GetEdge();
-            }
-            else
-            {
-                edge.Shape.BackgroundColor = Constants.compPrevColor;
-                turn = Turn.Player1;
-            }
-            ShowScore();
-            CheckIfGameIsOver();
-        }
-
-        void EdgeClicked(object sender, EventArgs e)
+        private async void OnMenuItemSelected(object sender, SelectedItemChangedEventArgs e)
         {
             try
             {
-                if (GetTurn() == Turn.Player2 || ((BoxView)sender).IsFilled()) return;
-                var shape = ((BoxView)sender);
-                PlaySound(player1Sound);
-                if (prevCompRect != null)
-                    prevCompRect.BackgroundColor = Constants.compColor;
-                shape.BackgroundColor = Constants.playerColor;
-                string[] splitted = shape.ClassId.Substring(1).Split('_');
-                bool found = false;
-                foreach (var id in splitted)
+                if (e.SelectedItem == null) return;
+                navigationDrawerList.SelectedItem = null;
+
+                if ((e.SelectedItem as MasterPageItem).Id == 1)
                 {
-                    int num = Convert.ToInt32(id);
-                    int houseId = (num % 4 == 0) ? num / 4 : num / 4 + 1;
-                    var house = houseDict[houseId];
-                    if (shapeDict[(4 * houseId).ToString()].IsFilled &&
-                        shapeDict[(4 * houseId - 1).ToString()].IsFilled &&
-                        shapeDict[(4 * houseId - 2).ToString()].IsFilled &&
-                        shapeDict[(4 * houseId - 3).ToString()].IsFilled)
-                    {
-                        house.FilledCount = 4;
-                        house.Grid.BackgroundColor = Constants.playerColor;
-                        found = true;
-                        if (GetTurn() == Turn.Player1)
-                            player1Score++;
-                        else
-                            player2Score++;
-                    }
-                    else
-                        house.FilledCount++;
+                    Detail = new NavigationPage(new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove));
+                    IsPresented = false;
                 }
-                if (!found)
-                    SetTurn((GetTurn() == Turn.Player1) ? Turn.Player2 : Turn.Player1);
-                ShowScore();
-                if (GetTurn() == Turn.Player2)
-                    CompMove();
-                CheckIfGameIsOver();
+                else if ((e.SelectedItem as MasterPageItem).Id == 2)
+                {
+                    var action = await DisplayActionSheet("Choose Board size", "Cancel", null, GetButtons(1));
+                    if (action == null || action == "Cancel") return;
+                    action = action.Replace("» ", "").Trim();
+                    int newBoardSize = Convert.ToInt32(action.Split('x')[0]);
+                    if (newBoardSize == currentBoardSize) return;
+                    currentBoardSize = newBoardSize;
+                    RebuildMenu(2, action);
+                    //Detail = new NavigationPage(new Test1(newBoardSize, currentFirstMove));
+                    XFToast.LongMessage(GetMessage());
+                }
+                else if ((e.SelectedItem as MasterPageItem).Id == 3)
+                {
+                    var action = await DisplayActionSheet("Choose Difficulty level", "Cancel", null, GetButtons(2));
+
+                    if (action == null || action == "Cancel") return;
+                    var newDifficulyLevel = (DifficulyLevel)Enum.Parse(typeof(DifficulyLevel), action.Replace("» ", "").Trim());
+                    if (newDifficulyLevel == currentDifficulyLevel) return;
+
+                    currentDifficulyLevel = newDifficulyLevel;
+                    RebuildMenu(3, currentDifficulyLevel.ToString());
+                    //Detail = new NavigationPage(new Test1(currentBoardSize, currentFirstMove));
+                    XFToast.LongMessage(GetMessage());
+                }
+                else if ((e.SelectedItem as MasterPageItem).Id == 4)
+                {
+                    var action = await DisplayActionSheet("Choose who should move first", "Cancel", null, GetButtons(3));
+
+                    if (action == null || action == "Cancel") return;
+                    action = action.Replace("» ", "").Trim();
+                    bool newFirstMove = (action == "CPU");
+                    if (newFirstMove == currentFirstMove) return;
+
+                    currentFirstMove = newFirstMove;
+                    RebuildMenu(4, action);
+                    //Detail = new NavigationPage(new Test1(currentBoardSize, firstMove));
+                    XFToast.LongMessage(GetMessage());
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }            
+        }
+
+        string GetMessage()
+        {
+            var message = entry.Text;
+            if (string.IsNullOrEmpty(message))
+            {
+                message = entry.Placeholder;
+            }
+            return message;
+        }
+    }
+
+    public class MasterPageItem
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string CurrentValue { get; set; }
+        public string Icon { get; set; }
+        public Type TargetType { get; set; }
+    }
+
+    public interface IMessage
+    {
+        void LongAlert(string message);
+        void ShortAlert(string message);
+    }
+
+    public static class XFToast
+    {
+        public static void ShortMessage(string message)
+        {
+            DependencyService.Get<IMessage>().ShortAlert(message);
+        }
+
+        public static void LongMessage(string message)
+        {
+            try
+            {
+            DependencyService.Get<IMessage>().LongAlert(message);
             }
             catch (Exception ex)
             {
-
             }
-        }
-
-        private async void btnNewGameClicked(object sender, EventArgs e)
-        {
-            var answer = await DisplayAlert("New Game", "Do you want to play a new game!", "Yes", "No");
-            if (!answer) return;
-            foreach (var item in grid.Children)
-            {
-                var rect = item as Xamarin.Forms.BoxView;
-                rect.BackgroundColor = rect.ClassId != null && rect.ClassId.StartsWith("vertex") ? vertexColor : edgeDefaultColor;
-            }
-            foreach (var item in houseDict)
-            {
-                item.Value.FilledCount = 0;
-            }
-            player1Score = player2Score = 0;
-            SetTurn(Turn.Player1);
-            ShowScore();
-            prevCompRect = null;
         }
     }
 }

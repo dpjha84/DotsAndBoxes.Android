@@ -1,32 +1,56 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<MasterDetailPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:DotsAndBoxesFun"
-             x:Class="DotsAndBoxesFun.MainPage">
+              x:Class="DotsAndBoxesFun.MainPage">
 
-  <ScrollView x:Name="scrollView" Grid.Row="1" Grid.Column="0" Padding="8">
-    <Grid>
-      <Grid.RowDefinitions>
-        <RowDefinition Height="12*" />
-        <RowDefinition Height="12*" />
-        <RowDefinition Height="1*" />
-        <RowDefinition Height="100*" />
-        <RowDefinition Height="1*" />
-        <RowDefinition Height="24*" />
-      </Grid.RowDefinitions>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
-      <Label x:Name="textPlayer1" Text="You" Grid.Row="0" Grid.Column="0" HorizontalOptions="Center" VerticalTextAlignment="Start" FontSize="16" Label.TextColor="Black" FontAttributes="Bold"/>
-      <Label x:Name="textPlayer2" Text="CPU" Grid.Row="0" Grid.Column="1" HorizontalOptions="Center" VerticalTextAlignment="Start" FontSize="16" Label.TextColor="Black" FontAttributes="Bold"/>
-      <Label x:Name="textPlayer1Score" Text="0" Grid.Row="1" Grid.Column="0" VerticalTextAlignment="Start" HorizontalOptions="Center" FontSize="22" Label.TextColor="Black" FontAttributes="Bold"/>
-      <Label x:Name="textPlayer2Score" Text="0" Grid.Row="1" Grid.Column="1" VerticalTextAlignment="Start" HorizontalOptions="Center" FontSize="22" Label.TextColor="Black" FontAttributes="Bold"/>
-      <BoxView x:Name ="separator1" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
-      <Grid x:Name="grid" VerticalOptions="StartAndExpand" HorizontalOptions="Fill" Grid.Row="3" Grid.ColumnSpan="2" />
-      <BoxView x:Name ="separator2" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"/>
-      <Button  x:Name="btnNewGame" Text="New Game" Grid.Row="5" Grid.ColumnSpan="2" Grid.Column="0" VerticalOptions="Start" Clicked="btnNewGameClicked" FontAttributes="Bold" />
-    </Grid>
-  </ScrollView>
+    <MasterDetailPage.Master>
+        <ContentPage Title="Menu"
+                 BackgroundColor="#e8e8e8">
 
-</ContentPage>
+            <StackLayout Orientation="Vertical">
+
+                <!-- 
+             This StackLayout you can use for other
+             data that you want to have in your menu drawer
+        -->
+                <StackLayout BackgroundColor="#e74c3c"
+                     HeightRequest="75">
+
+                    <Label Text="Some Text title"
+                 FontSize="20"
+                 VerticalOptions="CenterAndExpand"
+                 TextColor="White"
+                 HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <ListView x:Name="navigationDrawerList"
+                  RowHeight="60"
+                  SeparatorVisibility="None"
+                  BackgroundColor="#e8e8e8"
+                          ItemSelected="OnMenuItemSelected">
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <!-- Main design for our menu items -->
+                                <StackLayout VerticalOptions="FillAndExpand" Orientation="Horizontal" Padding="20,10,0,10" Spacing="20">
+                                    <Image Source="{Binding Icon}" WidthRequest="40" HeightRequest="40" VerticalOptions="Center" />
+                                    <Label Text="{Binding Title}" FontSize="Medium" VerticalOptions="Center" TextColor="Black"/>
+                                    <Label Text="{Binding CurrentValue}" FontSize="Small" HorizontalOptions="EndAndExpand" Margin="0,0,10,0" VerticalOptions="Center" TextColor="Gray"/>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackLayout>
+
+        </ContentPage>
+    </MasterDetailPage.Master>
+
+    <MasterDetailPage.Detail>
+        <NavigationPage>
+
+        </NavigationPage>
+    </MasterDetailPage.Detail>
+</MasterDetailPage>
