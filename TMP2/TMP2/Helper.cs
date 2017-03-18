@@ -11,7 +11,6 @@ namespace DotsAndBoxesFun
         public static Color compColor = Color.FromHex("#D13A1B");
         public static Color playerColor = Color.FromHex("#12B504");
         public static Color compPrevColor = Color.FromHex("#DBB312");
-        public static Dictionary<int, House> HouseDict = new Dictionary<int, House>();
 
         public static bool IsFilled(this BoxView shape)
         {
@@ -37,40 +36,7 @@ namespace DotsAndBoxesFun
 
         public int Id { get; set; }
         public Xamarin.Forms.BoxView Grid { get; set; }
-        public string Text { get; set; }
-        public int FilledCount { get; set; }
-
-        public House LeftHouse
-        {
-            get
-            {
-                return Id % count == 1 ? null : Constants.HouseDict[Id - 1];
-            }
-        }
-
-        public House RightHouse
-        {
-            get
-            {
-                return Id % count == 0 ? null : Constants.HouseDict[Id + 1];
-            }
-        }
-
-        public House UpHouse
-        {
-            get
-            {
-                return Id - count > 0 ? Constants.HouseDict[Id - count] : null;
-            }
-        }
-
-        public House DownHouse
-        {
-            get
-            {
-                return Id + count > count * count ? null : Constants.HouseDict[Id + count];
-            }
-        }
+        public int FilledCount { get; set; }        
 
         public Edge TopEdge
         {
@@ -124,17 +90,6 @@ namespace DotsAndBoxesFun
                 };
             }
         }
-
-        public List<House> NeighbourHouses
-        {
-            get
-            {
-                return new List<House>
-                {
-                    UpHouse, RightHouse, DownHouse, LeftHouse
-                };
-            }
-        }
     }
 
     public class Edge
@@ -156,60 +111,6 @@ namespace DotsAndBoxesFun
     public class ChainManager
     {
         public List<Chain> ChainList { get; set; } = new List<Chain>();
-
-        public int ChainCount { get { return ChainList.Count; } }
-
-        public Chain GetChain(House house, out House matchingNeighbour)
-        {
-            matchingNeighbour = null;
-            if (house == null) return null;
-            foreach (var neighbour in house.NeighbourHouses)
-            {
-                if (neighbour == null) continue;
-                foreach (var chain in ChainList)
-                {
-                    foreach (var box in chain.BoxList)
-                    {
-                        if (box.Id == neighbour.Id)
-                        {
-                            var edge = GetConnectingEdge(box, house);
-                            if (edge != null && !edge.IsFilled)
-                            {
-                                matchingNeighbour = neighbour;
-                                return chain;
-                            }
-                        }
-                    }
-                }
-                if (neighbour.FilledCount == 2)
-                {
-                    var chain = new Chain();
-                    chain.BoxList.Add(neighbour);
-                    ChainList.Add(chain);
-                }
-            }            
-            return null;
-        }
-
-        private Edge GetConnectingEdge(House house1, House house2)
-        {
-            foreach (var edge1 in house1.Edges)
-            {
-                foreach (var edge2 in house2.Edges)
-                {
-                    if (edge1.Name == edge2.Name)
-                        return edge1;
-                }
-            }
-            return null;
-        }
-
-        public void AddChain(House house)
-        {
-            var chain = new Chain();
-            chain.BoxList.Add(house);
-            ChainList.Add(chain);
-        }
     }
 
     public class Chain
@@ -225,9 +126,5 @@ namespace DotsAndBoxesFun
         public List<House> BoxList { get; set; } = new List<House>();
 
         public int Count { get { return BoxList.Count; } }
-
-        public ChainType Type { get; set; } = ChainType.Open;
     }
-
-    public enum ChainType { Open, Ready};
 }

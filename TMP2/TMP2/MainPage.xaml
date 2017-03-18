@@ -15,18 +15,17 @@
              data that you want to have in your menu drawer
         -->
                 <StackLayout BackgroundColor="#e74c3c"
-                     HeightRequest="75">
+                     HeightRequest="60">
 
-                    <Label Text="Some Text title"
-                 FontSize="20"
+                    <Label Text="Settings" FontSize="20"
                  VerticalOptions="CenterAndExpand"
                  TextColor="White"
-                 HorizontalOptions="Center"/>
+                 HorizontalOptions="StartAndExpand" Margin="20, 0, 0, 0"/>
                 </StackLayout>
 
                 <ListView x:Name="navigationDrawerList"
-                  RowHeight="60"
-                  SeparatorVisibility="None"
+                  RowHeight="50"
+                  SeparatorVisibility="Default"
                   BackgroundColor="#e8e8e8"
                           ItemSelected="OnMenuItemSelected">
 
@@ -34,9 +33,9 @@
                         <DataTemplate>
                             <ViewCell>
                                 <!-- Main design for our menu items -->
-                                <StackLayout VerticalOptions="FillAndExpand" Orientation="Horizontal" Padding="20,10,0,10" Spacing="20">
+                                <StackLayout VerticalOptions="FillAndExpand" Orientation="Horizontal" Padding="20,10,0,10" Spacing="0">
                                     <Image Source="{Binding Icon}" WidthRequest="40" HeightRequest="40" VerticalOptions="Center" />
-                                    <Label Text="{Binding Title}" FontSize="Medium" VerticalOptions="Center" TextColor="Black"/>
+                                    <Label Text="{Binding Title}" FontSize="15" VerticalOptions="Center" TextColor="Black"/>
                                     <Label Text="{Binding CurrentValue}" FontSize="Small" HorizontalOptions="EndAndExpand" Margin="0,0,10,0" VerticalOptions="Center" TextColor="Gray"/>
                                 </StackLayout>
                             </ViewCell>

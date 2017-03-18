@@ -19,7 +19,7 @@ namespace DotsAndBoxesFun
 
         int currentBoardSize = 6;
         bool currentFirstMove = false;
-        DifficulyLevel currentDifficulyLevel = DifficulyLevel.Hard;
+        DifficulyLevel currentDifficulyLevel = DifficulyLevel.Medium;
         public MainPage()
         {
             InitializeComponent();

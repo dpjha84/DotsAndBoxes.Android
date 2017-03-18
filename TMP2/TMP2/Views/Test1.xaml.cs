@@ -42,20 +42,6 @@ namespace DotsAndBoxesFun.Views
             {2, 2, 2}
         };
 
-        int[,] easyMoveArray = new int[,]
-        {
-            {3, 3, 3},
-            {3, 2, 3},
-            {3, 0, 3},
-            {3, 1, 3},
-            {0, 0, 0},
-            {0, 1, 0},
-            {1, 1, 1},
-            {2, 0, 0},
-            {2, 1, 1},
-            {2, 2, 2}
-        };
-
         public Test1(int boardSize, DifficulyLevel level, bool moveFirst)
         {
             this.InitializeComponent();
@@ -79,7 +65,7 @@ namespace DotsAndBoxesFun.Views
             NewGame();
         }
 
-        public Test1() : this(6, DifficulyLevel.Hard, false)
+        public Test1() : this(6, DifficulyLevel.Medium, false)
         {
         }
 
@@ -204,13 +190,7 @@ namespace DotsAndBoxesFun.Views
             for (int houseId = 1; houseId <= count*count; houseId++)
             {
                 houseDict[houseId].shapeDict = shapeDict;
-                //houseDict[houseId].LeftHouse = houseId % count == 1 ? null : houseDict[houseId - 1];
-                //houseDict[houseId].UpHouse = houseId - count > 0 ? houseDict[houseId - count] : null;
-                //houseDict[houseId].RightHouse = houseId % count == 0 ? null : houseDict[houseId + 1];
-                //houseDict[houseId].DownHouse = houseId + count > count * count ? null : houseDict[houseId + count];
             }
-
-            Constants.HouseDict = houseDict;
         }
 
         async void PlaySound(string fileName)
@@ -259,9 +239,9 @@ namespace DotsAndBoxesFun.Views
             {
                 prevCompRect.BackgroundColor = Constants.compColor;
                 if (player1Score == player2Score)
-                    DisplayAlert("Game over!", "It is tied", "OK");
+                    DisplayAlert("Game over!", "Game is tied. Try again!", "OK");
                 else
-                    DisplayAlert("Game over!", player1Score > player2Score ? "You won!!!" : "You lost!!!", "OK");
+                    DisplayAlert("Game over!", player1Score > player2Score ? "You won!" : "You lost. Try again!", "OK");
             }
         }
 
@@ -275,7 +255,7 @@ namespace DotsAndBoxesFun.Views
                     return;
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(1200);
                 PlaySound(player2Sound);
                 SetTurn(Turn.Player2);
                 ShowScore();
@@ -284,8 +264,6 @@ namespace DotsAndBoxesFun.Views
                 {
                     if (level == DifficulyLevel.Hard)
                     {
-                        int minLength = int.MaxValue;
-                        Chain minChain = null;
                         if ((moveArray[i, 0] == 2 && moveArray[i, 1] == 0) ||
                             (moveArray[i, 0] == 2 && moveArray[i, 1] == 1) ||
                             (moveArray[i, 0] == 2 && moveArray[i, 1] == 2))
@@ -297,20 +275,6 @@ namespace DotsAndBoxesFun.Views
                                 noOverlap = false;
                                 final = Merge(final, out noOverlap);
                             }
-
-                            //for (int k = 0; k < chainManager.ChainList.Count; k++)
-                            //{
-                            //    for (int j = 0; j < chainManager.ChainList[k].Count; j++)
-                            //    {
-                            //        int count1 = chainManager.ChainList[k].BoxList.Count;
-                            //        int count2 = chainManager.ChainList[j].BoxList.Count;
-                            //        if (k != j && chainManager.ChainList[k].BoxList[count1 - 1] == chainManager.ChainList[j].BoxList[count2 - 1])
-                            //        {
-                            //            chainManager.ChainList[k].BoxList.Concat(chainManager.ChainList[j].BoxList);
-                            //            chainManager.ChainList[j].BoxList.Clear();
-                            //        }
-                            //    }
-                            //}
                             var finalList = final.OrderBy(c => c.Count).Where(c => c.Count > 0).ToList();
                             foreach (var chain in finalList)
                             {
@@ -377,36 +341,36 @@ namespace DotsAndBoxesFun.Views
 
         async Task GetEdgeEasy()
         {
-            await Task.Delay(1000);
+            await Task.Delay(1200);
             PlaySound(player2Sound);
             SetTurn(Turn.Player2);
             ShowScore();
             List<Edge> list;
             for (int i = 0; i < 4; i++)
             {
-                list = GetList(easyMoveArray[i, 0], easyMoveArray[i, 1], easyMoveArray[i, 2]);
+                list = GetList(moveArray[i, 0], moveArray[i, 1], moveArray[i, 2]);
                 if (list.Count > 0)
                 {
                     UpdateEdge(list[rnd.Next(0, list.Count - 1)]);
                     return;
                 }
             }
-            for (int i = 4; i < easyMoveArray.GetLength(0) - 1; i++)
+            for (int i = 4; i < moveArray.GetLength(0) - 1; i++)
             {
-                int j = rnd.Next(i, easyMoveArray.GetLength(0));
-                var temp0 = easyMoveArray[i, 0];
-                var temp1 = easyMoveArray[i, 1];
-                var temp2 = easyMoveArray[i, 2];
-                easyMoveArray[i, 0] = easyMoveArray[j, 0];
-                easyMoveArray[i, 1] = easyMoveArray[j, 1];
-                easyMoveArray[i, 2] = easyMoveArray[j, 2];
-                easyMoveArray[j, 0] = temp0;
-                easyMoveArray[j, 1] = temp1;
-                easyMoveArray[j, 2] = temp2;
+                int j = rnd.Next(i, moveArray.GetLength(0));
+                var temp0 = moveArray[i, 0];
+                var temp1 = moveArray[i, 1];
+                var temp2 = moveArray[i, 2];
+                moveArray[i, 0] = moveArray[j, 0];
+                moveArray[i, 1] = moveArray[j, 1];
+                moveArray[i, 2] = moveArray[j, 2];
+                moveArray[j, 0] = temp0;
+                moveArray[j, 1] = temp1;
+                moveArray[j, 2] = temp2;
             }
-            for (int i = 4; i < easyMoveArray.GetLength(0); i++)
+            for (int i = 4; i < moveArray.GetLength(0); i++)
             {
-                list = GetList(easyMoveArray[i, 0], easyMoveArray[i, 1], easyMoveArray[i, 2]);
+                list = GetList(moveArray[i, 0], moveArray[i, 1], moveArray[i, 2]);
                 if (list.Count > 0)
                 {
                     UpdateEdge(list[rnd.Next(0, list.Count - 1)]);
@@ -478,42 +442,6 @@ namespace DotsAndBoxesFun.Views
         }
 
         ChainManager chainManager = new ChainManager();
-
-        private void UpdateChains1(Edge edge)
-        {
-            try
-            {
-                Chain chain = null;
-                if (level != DifficulyLevel.Hard) return;
-
-                if (edge.House1.FilledCount == 2)
-                {
-                    House neighbour = null;
-                    chain = chainManager.GetChain(edge.House1, out neighbour);
-                    if (chain != null)// && !GetConnectingEdge(neighbour, edge.House1).IsFilled)
-                        chain.BoxList.Add(edge.House1);
-                    else
-                    {
-                        chainManager.AddChain(edge.House1);
-                    }
-                }
-                //if (edge.House2 != null && edge.House2.FilledCount == 2)
-                //{
-                //    House neighbour = null;
-                //    chain = chainManager.GetChain(edge.House2, out neighbour);
-                //    if (chain != null)// && !GetConnectingEdge(neighbour, edge.House2).IsFilled)
-                //        chain.BoxList.Add(edge.House2);
-                //    else
-                //    {
-                //        chainManager.AddChain(edge.House2);
-                //    }
-                //}
-            }
-            catch(Exception ex)
-            {
-
-            }                    
-        }
 
         private void UpdateChains(Edge edge)
         {
@@ -630,16 +558,16 @@ namespace DotsAndBoxesFun.Views
                     chainManager.ChainList = Merge(chainManager.ChainList, out noOverlap);
                 }
 
-                List<Color> colors = new List<Color> { Color.Fuchsia, Color.Gray, Color.Green, Color.Lime, Color.Maroon, Color.Navy };
-                int i = 0;
-                foreach (var item in chainManager.ChainList)
-                {
-                    foreach (var box in item.BoxList)
-                    {
-                        //box.Grid.BackgroundColor = colors[i];
-                    }
-                    i++;
-                }
+                //List<Color> colors = new List<Color> { Color.Fuchsia, Color.Gray, Color.Green, Color.Lime, Color.Maroon, Color.Navy };
+                //int i = 0;
+                //foreach (var item in chainManager.ChainList)
+                //{
+                //    foreach (var box in item.BoxList)
+                //    {
+                //        //box.Grid.BackgroundColor = colors[i];
+                //    }
+                //    i++;
+                //}
             }
             catch (Exception ex)
             {
@@ -670,19 +598,6 @@ namespace DotsAndBoxesFun.Views
             }
             return emptyEdges;
         }
-
-        //public Edge GetConnectingEdge(House house1, House house2)
-        //{
-        //    foreach (var edge1 in house1.Edges)
-        //    {
-        //        foreach (var edge2 in house2.Edges)
-        //        {
-        //            if (edge1.Name == edge2.Name)
-        //                return edge1;
-        //        }
-        //    }
-        //    return null;
-        //}
 
         void EdgeClicked(object sender, EventArgs e)
         {
@@ -734,25 +649,6 @@ namespace DotsAndBoxesFun.Views
             {
 
             }
-        }
-
-        private async void btnNewGameClicked(object sender, EventArgs e)
-        {
-            var answer = await DisplayAlert("New Game", "Do you want to play a new game!", "Yes", "No");
-            if (!answer) return;
-            foreach (var item in grid.Children)
-            {
-                var rect = item as Xamarin.Forms.BoxView;
-                rect.BackgroundColor = rect.ClassId != null && rect.ClassId.StartsWith("vertex") ? vertexColor : edgeDefaultColor;
-            }
-            foreach (var item in houseDict)
-            {
-                item.Value.FilledCount = 0;
-            }
-            player1Score = player2Score = 0;
-            SetTurn(Turn.Player1);
-            ShowScore();
-            prevCompRect = null;
-        }
+        }        
     }
 }

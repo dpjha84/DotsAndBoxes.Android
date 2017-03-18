@@ -23,7 +23,7 @@
             <BoxView x:Name ="separator1" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
             <Grid x:Name="grid" VerticalOptions="Start" HorizontalOptions="Fill" Grid.Row="3" Grid.ColumnSpan="2" />
             <BoxView x:Name ="separator2" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"/>
-            <Button x:Name="btnNewGame" Text="" IsEnabled="False" Grid.Row="5" Grid.ColumnSpan="2" Grid.Column="0" VerticalOptions="Start" Clicked="btnNewGameClicked" FontAttributes="Bold" />
+            <Button x:Name="btnNewGame" Text="" IsEnabled="False" Grid.Row="5" Grid.ColumnSpan="2" Grid.Column="0" VerticalOptions="Start" FontAttributes="Bold" />
         </Grid>
     </ScrollView>
 </ContentPage>
