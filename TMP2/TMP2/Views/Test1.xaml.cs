@@ -65,10 +65,6 @@ namespace DotsAndBoxesFun.Views
             NewGame();
         }
 
-        public Test1() : this(6, DifficulyLevel.Medium, false)
-        {
-        }
-
         Turn GetTurn()
         {
             lock (lockObject)
@@ -115,9 +111,13 @@ namespace DotsAndBoxesFun.Views
                         {
                             shape.BackgroundColor = edgeDefaultColor;
                             houseDict.Add(++houseCount, new House(count) { Id = houseCount, Grid = shape });
+                            shape.ClassId = string.Format("house_{0}_{1}", i, j);
                         }
                         else
                             shape.ClassId = string.Format("vertex{0}{1}", i, j);
+                        var tabGestureOrganiser1 = new TapGestureRecognizer();
+                        tabGestureOrganiser1.Tapped += EdgeClicked;
+                        shape.GestureRecognizers.Add(tabGestureOrganiser1);
                         continue;
                     }
                     if (start)
@@ -195,12 +195,7 @@ namespace DotsAndBoxesFun.Views
 
         async void PlaySound(string fileName)
         {
-            //MediaElement mysong = new MediaElement();
-            //Windows.Storage.StorageFolder folder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
-            //Windows.Storage.StorageFile file = await folder.GetFileAsync(fileName);
-            //var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
-            //mysong.SetSource(stream, file.ContentType);
-            //mysong.Play();
+            DependencyService.Get<IAudio>().PlayAudioFile(fileName);
         }
 
         async Task CompMove()
@@ -256,7 +251,6 @@ namespace DotsAndBoxesFun.Views
                 }
 
                 await Task.Delay(1200);
-                PlaySound(player2Sound);
                 SetTurn(Turn.Player2);
                 ShowScore();
                 List<Edge> list;
@@ -341,8 +335,7 @@ namespace DotsAndBoxesFun.Views
 
         async Task GetEdgeEasy()
         {
-            await Task.Delay(1200);
-            PlaySound(player2Sound);
+            await Task.Delay(1200);            
             SetTurn(Turn.Player2);
             ShowScore();
             List<Edge> list;
@@ -403,13 +396,13 @@ namespace DotsAndBoxesFun.Views
 
         private void UpdateEdge(Edge edge)
         {
+            PlaySound(player2Sound);
             if (prevCompRect != null)
                 prevCompRect.BackgroundColor = Constants.compColor;
             edge.House1.FilledCount++;
             prevCompRect = edge.Shape;
 
             edge.Shape.BackgroundColor = Constants.compColor;
-            //edge.Shape = 5;
             if (edge.House2 != null)
                 edge.House2.FilledCount++;
             bool houseMade = false;
@@ -599,50 +592,86 @@ namespace DotsAndBoxesFun.Views
             return emptyEdges;
         }
 
-        void EdgeClicked(object sender, EventArgs e)
+        async void EdgeClicked(object sender, EventArgs e)
         {
             try
             {
                 if (GetTurn() == Turn.Player2 || ((BoxView)sender).IsFilled()) return;
-                var shape = ((BoxView)sender);
-                PlaySound(player1Sound);
+                var shape = ((BoxView)sender);                
                 if (prevCompRect != null)
                     prevCompRect.BackgroundColor = Constants.compColor;
-                shape.BackgroundColor = Constants.playerColor;
-                string[] splitted = shape.ClassId.Substring(1).Split('_');
                 bool found = false;
-                foreach (var id in splitted)
+                bool houseClicked = false;
+                if (shape.ClassId.StartsWith("house"))
                 {
-                    int num = Convert.ToInt32(id);
-                    int houseId = (num % 4 == 0) ? num / 4 : num / 4 + 1;
-                    var house = houseDict[houseId];
-                    if (shapeDict[(4 * houseId).ToString()].IsFilled &&
-                        shapeDict[(4 * houseId - 1).ToString()].IsFilled &&
-                        shapeDict[(4 * houseId - 2).ToString()].IsFilled &&
-                        shapeDict[(4 * houseId - 3).ToString()].IsFilled)
+                    houseClicked = true;
+                    var hs = shape.ClassId.Split('_');
+                    int houseId = ((Convert.ToInt32(hs[1]) - 1) / 2) * count + (Convert.ToInt32(hs[2]) + 1) / 2;
+                    if (houseDict[houseId].FilledCount == 3)
                     {
-                        house.FilledCount = 4;
-                        house.Grid.BackgroundColor = Constants.playerColor;
-                        found = true;
-                        if (GetTurn() == Turn.Player1)
+                        PlaySound(player1Sound);
+                        shape.BackgroundColor = Constants.playerColor;
+                        var house = houseDict[houseId];
+                        var edge = house.Edges.Where(x => x.IsFilled == false).FirstOrDefault();
+                        edge.Fill();
+                        edge.House1.FilledCount++;
+                        if (edge.House1.FilledCount == 4)
+                        {
+                            edge.House1.Fill();
                             player1Score++;
-                        else
-                            player2Score++;
+                        }
+                        if (edge.House2 != null)
+                        {
+                            edge.House2.FilledCount++;
+                            if (edge.House2.FilledCount == 4)
+                            {
+                                edge.House2.Fill();
+                                player1Score++;
+                            }
+                        }
                     }
-                    else
-                        house.FilledCount++;
                 }
+                else
+                {
+                    PlaySound(player1Sound);
+                    shape.BackgroundColor = Constants.playerColor;
+                    string[] splitted = shape.ClassId.Substring(1).Split('_');
+
+                    foreach (var id in splitted)
+                    {
+                        int num = Convert.ToInt32(id);
+                        int houseId = (num % 4 == 0) ? num / 4 : num / 4 + 1;
+                        var house = houseDict[houseId];
+                        if (shapeDict[(4 * houseId).ToString()].IsFilled &&
+                            shapeDict[(4 * houseId - 1).ToString()].IsFilled &&
+                            shapeDict[(4 * houseId - 2).ToString()].IsFilled &&
+                            shapeDict[(4 * houseId - 3).ToString()].IsFilled)
+                        {
+                            house.FilledCount = 4;
+                            house.Grid.BackgroundColor = Constants.playerColor;
+                            found = true;
+                            if (GetTurn() == Turn.Player1)
+                                player1Score++;
+                            else
+                                player2Score++;
+                        }
+                        else
+                            house.FilledCount++;
+                    }
+                }                
                 if (level == DifficulyLevel.Hard)
                 {
                     Edge edge = shapeDict.Values.Where(x => x.Name == shape.ClassId).FirstOrDefault();
                     UpdateChains(edge);
-                }
-                    
-                if (!found)
+                }                    
+                if (!found && !houseClicked)
                     SetTurn((GetTurn() == Turn.Player1) ? Turn.Player2 : Turn.Player1);
                 ShowScore();
                 if (GetTurn() == Turn.Player2)
-                    CompMove();
+                {
+                    await CompMove();
+                }
+                    
                 CheckIfGameIsOver();
             }
             catch (Exception ex)

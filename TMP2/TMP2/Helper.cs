@@ -90,6 +90,11 @@ namespace DotsAndBoxesFun
                 };
             }
         }
+
+        public void Fill()
+        {
+            Grid.BackgroundColor = Constants.playerColor;
+        }
     }
 
     public class Edge
@@ -105,6 +110,11 @@ namespace DotsAndBoxesFun
             {
                 return Shape.BackgroundColor == Constants.playerColor || Shape.BackgroundColor == Constants.compColor || Shape.BackgroundColor == Constants.compPrevColor;
             }
+        }
+
+        public void Fill()
+        {
+            Shape.BackgroundColor = Constants.playerColor;
         }
     }
 

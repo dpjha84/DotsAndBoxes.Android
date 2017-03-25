@@ -39,7 +39,7 @@ namespace DotsAndBoxesFun
             navigationDrawerList.ItemsSource = menuList;
 
             // Initial navigation, this can be used for our home page
-            Detail = new NavigationPage((Page)Activator.CreateInstance(typeof(Test1)));
+            Detail = new NavigationPage(new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove));
         }
 
         private void BuildMenu()
@@ -222,5 +222,10 @@ namespace DotsAndBoxesFun
             {
             }
         }
+    }
+
+    public interface IAudio
+    {
+        void PlayAudioFile(string fileName);
     }
 }
