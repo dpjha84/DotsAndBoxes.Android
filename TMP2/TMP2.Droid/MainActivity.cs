@@ -14,7 +14,7 @@ using Android.Media;
 [assembly: Xamarin.Forms.Dependency(typeof(AudioService))]
 namespace TMP2.Droid
 {
-    [Activity(Label = "Dots and Boxes Fun", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "Dots and Boxes Fun", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = false, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle bundle)
@@ -26,6 +26,19 @@ namespace TMP2.Droid
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());
+        }
+    }
+
+    [Activity(Theme = "@style/Theme.Splash", //Indicates the theme to use for this activity
+             MainLauncher = true, //Set it as boot activity
+             NoHistory = true)] //Doesn't place it in back stack
+    public class SplashActivity : Activity
+    {
+        protected override void OnCreate(Bundle bundle)
+        {
+            base.OnCreate(bundle);
+            System.Threading.Thread.Sleep(3000); //Let's wait awhile...
+            this.StartActivity(typeof(MainActivity));
         }
     }
 

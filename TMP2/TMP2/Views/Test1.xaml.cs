@@ -22,6 +22,7 @@ namespace DotsAndBoxesFun.Views
         DifficulyLevel level = DifficulyLevel.Medium;
         const string player1Sound = "cool1.mp3";
         const string player2Sound = "cool2.mp3";
+        const string houseMadeSound = "cool3.mp3";
         Dictionary<string, Edge> shapeDict = new Dictionary<string, Edge>();
         Dictionary<int, House> houseDict = new Dictionary<int, House>();
         int houseCount = 0;
@@ -411,16 +412,19 @@ namespace DotsAndBoxesFun.Views
                 player2Score++;
                 edge.House1.Grid.BackgroundColor = Constants.compColor;
                 houseMade = true;
+                Animate(edge.House1.Grid);
             }
             if (edge.House2 != null && edge.House2.FilledCount == 4)
             {
                 player2Score++;
                 edge.House2.Grid.BackgroundColor = Constants.compColor;
                 houseMade = true;
+                Animate(edge.House2.Grid);
             }
             if (houseMade)
             {
                 edge.Shape.BackgroundColor = Constants.compColor;
+                
                 UpdateChains(edge);
                 GetEdge();
             }
@@ -432,6 +436,20 @@ namespace DotsAndBoxesFun.Views
             }            
             ShowScore();
             CheckIfGameIsOver();
+        }
+
+        private async void Animate(BoxView house, Label text = null)
+        {
+            var storyboard = new Animation();
+            var rotation = new Animation(callback: d => house.Rotation = d,
+                                          start: house.Rotation,
+                                          end: house.Rotation + 180,
+                                          easing: Easing.Linear);
+            storyboard.Add(0, 1, rotation);
+            storyboard.Commit(house, "Loop", length: 500);
+            PlaySound(houseMadeSound);
+            //await text?.ScaleTo(1.5, 200, Easing.Linear);
+            //await text?.ScaleTo(1, 100, Easing.Linear);
         }
 
         ChainManager chainManager = new ChainManager();
@@ -618,6 +636,7 @@ namespace DotsAndBoxesFun.Views
                         if (edge.House1.FilledCount == 4)
                         {
                             edge.House1.Fill();
+                            Animate(edge.House1.Grid);
                             player1Score++;
                         }
                         if (edge.House2 != null)
@@ -626,6 +645,7 @@ namespace DotsAndBoxesFun.Views
                             if (edge.House2.FilledCount == 4)
                             {
                                 edge.House2.Fill();
+                                Animate(edge.House2.Grid);
                                 player1Score++;
                             }
                         }
@@ -649,6 +669,7 @@ namespace DotsAndBoxesFun.Views
                         {
                             house.FilledCount = 4;
                             house.Grid.BackgroundColor = Constants.playerColor;
+                            Animate(house.Grid, textPlayer1Score);
                             found = true;
                             if (GetTurn() == Turn.Player1)
                                 player1Score++;

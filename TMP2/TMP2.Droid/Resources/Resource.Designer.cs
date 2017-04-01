@@ -4697,6 +4697,9 @@ namespace TMP2.Droid
 			// aapt resource value: 0x7f07000a
 			public const int Theme_MediaRouter_LightControlPanel = 2131165194;
 			
+			// aapt resource value: 0x7f07018c
+			public const int Theme_Splash = 2131165580;
+			
 			// aapt resource value: 0x7f07013a
 			public const int ThemeOverlay_AppCompat = 2131165498;
 			
