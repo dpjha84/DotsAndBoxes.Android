@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 
 namespace DotsAndBoxesFun.Views
@@ -113,12 +110,12 @@ namespace DotsAndBoxesFun.Views
                             shape.BackgroundColor = edgeDefaultColor;
                             houseDict.Add(++houseCount, new House(count) { Id = houseCount, Grid = shape });
                             shape.ClassId = string.Format("house_{0}_{1}", i, j);
+                            var tabGestureOrganiser1 = new TapGestureRecognizer();
+                            tabGestureOrganiser1.Tapped += EdgeClicked;
+                            shape.GestureRecognizers.Add(tabGestureOrganiser1);
                         }
                         else
-                            shape.ClassId = string.Format("vertex{0}{1}", i, j);
-                        var tabGestureOrganiser1 = new TapGestureRecognizer();
-                        tabGestureOrganiser1.Tapped += EdgeClicked;
-                        shape.GestureRecognizers.Add(tabGestureOrganiser1);
+                            shape.ClassId = string.Format("vertex{0}{1}", i, j);                        
                         continue;
                     }
                     if (start)
@@ -241,6 +238,17 @@ namespace DotsAndBoxesFun.Views
             }
         }
 
+        private List<Chain> GetAvailableList(List<Chain> current)
+        {
+            var list = new List<Chain>();
+            foreach (var chain in current)
+            {
+                if (chain.BoxList.Any(h => h.FilledCount < 4))
+                    list.Add(chain);
+            }
+            return list;
+        }
+
         async Task GetEdge()
         {
             try
@@ -271,17 +279,29 @@ namespace DotsAndBoxesFun.Views
                                 final = Merge(final, out noOverlap);
                             }
                             var finalList = final.OrderBy(c => c.Count).Where(c => c.Count > 0).ToList();
-                            foreach (var chain in finalList)
+                            var newList = GetAvailableList(finalList);
+                            foreach (var chain in newList)
                             {
+                                if (chain.BoxList.Count == 2)
+                                {
+                                    foreach (var e1 in chain.BoxList[0].Edges)
+                                    {
+                                        foreach (var e2 in chain.BoxList[1].Edges)
+                                        {
+                                            if (e1.Name == e2.Name && !e1.IsFilled)
+                                            {
+                                                UpdateEdge(e1);
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
                                 foreach (var box in chain.BoxList)
                                 {
                                     foreach (var e in GetEmptyEdges(box))
                                     {
-                                        if (!e.IsFilled)
-                                        {
                                             UpdateEdge(e);
                                             return;
-                                        }
                                     }
                                 }
                             }                        
@@ -575,7 +595,7 @@ namespace DotsAndBoxesFun.Views
                 //{
                 //    foreach (var box in item.BoxList)
                 //    {
-                //        //box.Grid.BackgroundColor = colors[i];
+                //        box.Grid.BackgroundColor = colors[i];
                 //    }
                 //    i++;
                 //}
@@ -602,6 +622,7 @@ namespace DotsAndBoxesFun.Views
         private List<Edge> GetEmptyEdges(House house)
         {
             List<Edge> emptyEdges = new List<Edge>();
+            
             foreach (var edge in house.Edges)
             {
                 if (!edge.IsFilled)
