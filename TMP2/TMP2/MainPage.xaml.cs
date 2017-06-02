@@ -20,11 +20,13 @@ namespace DotsAndBoxesFun
         int currentBoardSize = 6;
         bool currentFirstMove = false;
         DifficulyLevel currentDifficulyLevel = DifficulyLevel.Medium;
+        bool IsMute = false;
+        Test1 currentGame;
         public MainPage()
         {
             InitializeComponent();
 
-            entry.Placeholder = "Settings saved. Hit New Game to play with new settings.";
+            entry.Placeholder = "Settings updated.";
             entry.HorizontalOptions = LayoutOptions.Center;
 
             menuList = new ObservableCollection<MasterPageItem>();
@@ -39,7 +41,7 @@ namespace DotsAndBoxesFun
             navigationDrawerList.ItemsSource = menuList;
 
             // Initial navigation, this can be used for our home page
-            Detail = new NavigationPage(new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove));
+            Detail = new NavigationPage(StartGame());
         }
 
         private void BuildMenu()
@@ -47,21 +49,27 @@ namespace DotsAndBoxesFun
             var page1 = new MasterPageItem() { Id = 1, Title = "New Game", Icon = "itemIcon5.png" };
             var page2 = new MasterPageItem() { Id = 2, Title = "Board size", Icon = "itemIcon2.png", CurrentValue = "6x6" };
             var page3 = new MasterPageItem() { Id = 3, Title = "Difficulty level", Icon = "itemIcon3.png", CurrentValue = "Medium" };
-            var page4= new MasterPageItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png", CurrentValue = "You" };
+            var page4 = new MasterPageItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png", CurrentValue = "You" };
+            var page5 = new MasterPageItem() { Id = 5, Title = "Sound", Icon = "sound.png", CurrentValue = "On" };
+            var page6 = new MasterPageItem() { Id = 6, Title = "Give Feedback", Icon = "feedback.png", CurrentValue = "" };
 
             menuList.Add(page1);
             menuList.Add(page2);
             menuList.Add(page3);
             menuList.Add(page4);
+            menuList.Add(page5);
+            menuList.Add(page6);
         }
 
         private void RebuildMenu(int id, string newValue)
         {
-            MasterPageItem page1, page2, page3, page4;
+            MasterPageItem page1, page2, page3, page4, page5, page6;
             page1 = new MasterPageItem() { Id = 1, Title = "New Game", Icon = "itemIcon5.png" };
             page2 = new MasterPageItem() { Id = 2, Title = "Board size", Icon = "itemIcon2.png", CurrentValue = menuList[1].CurrentValue };
             page3 = new MasterPageItem() { Id = 3, Title = "Difficulty level", Icon = "itemIcon3.png", CurrentValue = menuList[2].CurrentValue };
             page4 = new MasterPageItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png",CurrentValue = menuList[3].CurrentValue };
+            page5 = new MasterPageItem() { Id = 5, Title = "Sound", Icon = "sound.png", CurrentValue = menuList[4].CurrentValue };
+            page6 = new MasterPageItem() { Id = 6, Title = "Give Feedback", Icon = "feedback.png", CurrentValue = menuList[5].CurrentValue };
 
             if (id == 2)
                 page2.CurrentValue = newValue;
@@ -69,6 +77,8 @@ namespace DotsAndBoxesFun
                 page3.CurrentValue = newValue;
             else if (id == 4)
                 page4.CurrentValue = newValue;
+            else if (id == 5)
+                page5.CurrentValue = newValue;
 
             menuList.Clear();
 
@@ -76,6 +86,8 @@ namespace DotsAndBoxesFun
             menuList.Add(page2);
             menuList.Add(page3);
             menuList.Add(page4);
+            menuList.Add(page5);
+            menuList.Add(page6);
         }
 
         private string[] GetButtons(int menuId)
@@ -127,12 +139,8 @@ namespace DotsAndBoxesFun
             {
                 if (e.SelectedItem == null) return;
                 navigationDrawerList.SelectedItem = null;
-
                 if ((e.SelectedItem as MasterPageItem).Id == 1)
-                {
-                    Detail = new NavigationPage(new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove));
-                    IsPresented = false;
-                }
+                    Detail = new NavigationPage(StartGame());
                 else if ((e.SelectedItem as MasterPageItem).Id == 2)
                 {
                     var action = await DisplayActionSheet("Choose Board size", "Cancel", null, GetButtons(1));
@@ -142,8 +150,8 @@ namespace DotsAndBoxesFun
                     if (newBoardSize == currentBoardSize) return;
                     currentBoardSize = newBoardSize;
                     RebuildMenu(2, action);
-                    //Detail = new NavigationPage(new Test1(newBoardSize, currentFirstMove));
-                    XFToast.LongMessage(GetMessage());
+                    Detail = new NavigationPage(StartGame());
+                    XFToast.LongMessage($"Board size is set to {action}");
                 }
                 else if ((e.SelectedItem as MasterPageItem).Id == 3)
                 {
@@ -155,8 +163,8 @@ namespace DotsAndBoxesFun
 
                     currentDifficulyLevel = newDifficulyLevel;
                     RebuildMenu(3, currentDifficulyLevel.ToString());
-                    //Detail = new NavigationPage(new Test1(currentBoardSize, currentFirstMove));
-                    XFToast.LongMessage(GetMessage());
+                    Detail = new NavigationPage(StartGame());
+                    XFToast.LongMessage($"Difficulty level is set to {currentDifficulyLevel.ToString()}");
                 }
                 else if ((e.SelectedItem as MasterPageItem).Id == 4)
                 {
@@ -169,24 +177,33 @@ namespace DotsAndBoxesFun
 
                     currentFirstMove = newFirstMove;
                     RebuildMenu(4, action);
-                    //Detail = new NavigationPage(new Test1(currentBoardSize, firstMove));
-                    XFToast.LongMessage(GetMessage());
+                    Detail = new NavigationPage(StartGame());
+                    XFToast.LongMessage($"First move is set to {action}");
                 }
+                else if ((e.SelectedItem as MasterPageItem).Id == 5)
+                {
+                    IsMute = currentGame.IsMute = !currentGame.IsMute;
+                    string newValue = currentGame.IsMute ? "Off" : "On";
+                    RebuildMenu(5, newValue);
+                    XFToast.LongMessage($"Sound is {newValue}");
+                }
+                else if ((e.SelectedItem as MasterPageItem).Id == 6)
+                {
+                    Device.OpenUri(new Uri("https://play.google.com/store/apps/details?id=com.game.dotsandboxesfun"));
+                }
+                    //Detail = new NavigationPage(new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove));
+                IsPresented = false;
             }
             catch(Exception ex)
             {
 
             }            
         }
-
-        string GetMessage()
+        
+        private Test1 StartGame()
         {
-            var message = entry.Text;
-            if (string.IsNullOrEmpty(message))
-            {
-                message = entry.Placeholder;
-            }
-            return message;
+            currentGame = new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove, IsMute);
+            return currentGame;
         }
     }
 
@@ -196,7 +213,6 @@ namespace DotsAndBoxesFun
         public string Title { get; set; }
         public string CurrentValue { get; set; }
         public string Icon { get; set; }
-        public Type TargetType { get; set; }
     }
 
     public interface IMessage
@@ -207,11 +223,6 @@ namespace DotsAndBoxesFun
 
     public static class XFToast
     {
-        public static void ShortMessage(string message)
-        {
-            DependencyService.Get<IMessage>().ShortAlert(message);
-        }
-
         public static void LongMessage(string message)
         {
             try

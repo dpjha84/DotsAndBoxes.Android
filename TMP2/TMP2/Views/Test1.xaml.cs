@@ -40,7 +40,9 @@ namespace DotsAndBoxesFun.Views
             {2, 2, 2}
         };
 
-        public Test1(int boardSize, DifficulyLevel level, bool moveFirst)
+        public bool IsMute { get; set; }
+
+        public Test1(int boardSize, DifficulyLevel level, bool moveFirst, bool isMute)
         {
             this.InitializeComponent();
             grid.SizeChanged += (object sender, EventArgs e) =>
@@ -60,6 +62,7 @@ namespace DotsAndBoxesFun.Views
             count = boardSize;
             this.moveFirst = moveFirst;
             this.level = level;
+            IsMute = isMute;
             NewGame();
         }
 
@@ -193,6 +196,7 @@ namespace DotsAndBoxesFun.Views
 
         async void PlaySound(string fileName)
         {
+            if (IsMute) return;
             DependencyService.Get<IAudio>().PlayAudioFile(fileName);
         }
 
@@ -450,9 +454,9 @@ namespace DotsAndBoxesFun.Views
             }
             else
             {
-                edge.Shape.BackgroundColor = Constants.compPrevColor;
-                turn = Turn.Player1;
+                edge.Shape.BackgroundColor = Constants.compPrevColor;                
                 UpdateChains(edge);
+                SetTurn(Turn.Player1);
             }            
             ShowScore();
             CheckIfGameIsOver();
@@ -635,86 +639,92 @@ namespace DotsAndBoxesFun.Views
         {
             try
             {
-                if (GetTurn() == Turn.Player2 || ((BoxView)sender).IsFilled()) return;
-                var shape = ((BoxView)sender);                
-                if (prevCompRect != null)
-                    prevCompRect.BackgroundColor = Constants.compColor;
-                bool found = false;
-                bool houseClicked = false;
-                if (shape.ClassId.StartsWith("house"))
+                if (GetTurn() == Turn.Player1 && !((BoxView)sender).IsFilled())
                 {
-                    houseClicked = true;
-                    var hs = shape.ClassId.Split('_');
-                    int houseId = ((Convert.ToInt32(hs[1]) - 1) / 2) * count + (Convert.ToInt32(hs[2]) + 1) / 2;
-                    if (houseDict[houseId].FilledCount == 3)
+                    var shape = ((BoxView)sender);
+                    if (prevCompRect != null)
+                        prevCompRect.BackgroundColor = Constants.compColor;
+                    bool found = false;
+                    bool houseClicked = false;
+                    if (shape.ClassId.StartsWith("house"))
+                    {
+                        houseClicked = true;
+                        var hs = shape.ClassId.Split('_');
+                        int houseId = ((Convert.ToInt32(hs[1]) - 1) / 2) * count + (Convert.ToInt32(hs[2]) + 1) / 2;
+                        if (houseDict[houseId].FilledCount == 3 && GetTurn() == Turn.Player1)
+                        {
+                            PlaySound(player1Sound);
+                            shape.BackgroundColor = Constants.playerColor;
+                            var house = houseDict[houseId];
+                            var edge = house.Edges.Where(x => x.IsFilled == false).FirstOrDefault();
+                            edge.Fill();
+                            edge.House1.FilledCount++;
+                            if (edge.House1.FilledCount == 4)
+                            {
+                                edge.House1.Fill();
+                                Animate(edge.House1.Grid);
+                                player1Score++;
+                            }
+                            if (edge.House2 != null)
+                            {
+                                edge.House2.FilledCount++;
+                                if (edge.House2.FilledCount == 4)
+                                {
+                                    edge.House2.Fill();
+                                    Animate(edge.House2.Grid);
+                                    player1Score++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            prevCompRect.BackgroundColor = Constants.compPrevColor;
+                        }
+                    }
+                    else
                     {
                         PlaySound(player1Sound);
                         shape.BackgroundColor = Constants.playerColor;
-                        var house = houseDict[houseId];
-                        var edge = house.Edges.Where(x => x.IsFilled == false).FirstOrDefault();
-                        edge.Fill();
-                        edge.House1.FilledCount++;
-                        if (edge.House1.FilledCount == 4)
-                        {
-                            edge.House1.Fill();
-                            Animate(edge.House1.Grid);
-                            player1Score++;
-                        }
-                        if (edge.House2 != null)
-                        {
-                            edge.House2.FilledCount++;
-                            if (edge.House2.FilledCount == 4)
-                            {
-                                edge.House2.Fill();
-                                Animate(edge.House2.Grid);
-                                player1Score++;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    PlaySound(player1Sound);
-                    shape.BackgroundColor = Constants.playerColor;
-                    string[] splitted = shape.ClassId.Substring(1).Split('_');
+                        string[] splitted = shape.ClassId.Substring(1).Split('_');
 
-                    foreach (var id in splitted)
-                    {
-                        int num = Convert.ToInt32(id);
-                        int houseId = (num % 4 == 0) ? num / 4 : num / 4 + 1;
-                        var house = houseDict[houseId];
-                        if (shapeDict[(4 * houseId).ToString()].IsFilled &&
-                            shapeDict[(4 * houseId - 1).ToString()].IsFilled &&
-                            shapeDict[(4 * houseId - 2).ToString()].IsFilled &&
-                            shapeDict[(4 * houseId - 3).ToString()].IsFilled)
+                        foreach (var id in splitted)
                         {
-                            house.FilledCount = 4;
-                            house.Grid.BackgroundColor = Constants.playerColor;
-                            Animate(house.Grid, textPlayer1Score);
-                            found = true;
-                            if (GetTurn() == Turn.Player1)
-                                player1Score++;
+                            int num = Convert.ToInt32(id);
+                            int houseId = (num % 4 == 0) ? num / 4 : num / 4 + 1;
+                            var house = houseDict[houseId];
+                            if (shapeDict[(4 * houseId).ToString()].IsFilled &&
+                                shapeDict[(4 * houseId - 1).ToString()].IsFilled &&
+                                shapeDict[(4 * houseId - 2).ToString()].IsFilled &&
+                                shapeDict[(4 * houseId - 3).ToString()].IsFilled)
+                            {
+                                house.FilledCount = 4;
+                                house.Grid.BackgroundColor = Constants.playerColor;
+                                Animate(house.Grid, textPlayer1Score);
+                                found = true;
+                                if (GetTurn() == Turn.Player1)
+                                    player1Score++;
+                                else
+                                    player2Score++;
+                            }
                             else
-                                player2Score++;
+                                house.FilledCount++;
                         }
-                        else
-                            house.FilledCount++;
                     }
-                }                
-                if (level == DifficulyLevel.Hard)
-                {
-                    Edge edge = shapeDict.Values.Where(x => x.Name == shape.ClassId).FirstOrDefault();
-                    UpdateChains(edge);
-                }                    
-                if (!found && !houseClicked)
-                    SetTurn((GetTurn() == Turn.Player1) ? Turn.Player2 : Turn.Player1);
-                ShowScore();
-                if (GetTurn() == Turn.Player2)
-                {
-                    await CompMove();
+                    if (level == DifficulyLevel.Hard)
+                    {
+                        Edge edge = shapeDict.Values.Where(x => x.Name == shape.ClassId).FirstOrDefault();
+                        UpdateChains(edge);
+                    }
+                    if (!found && !houseClicked)
+                        SetTurn((GetTurn() == Turn.Player1) ? Turn.Player2 : Turn.Player1);
+                    ShowScore();
+                    if (GetTurn() == Turn.Player2)
+                    {
+                        await CompMove();
+                    }
+
+                    CheckIfGameIsOver();
                 }
-                    
-                CheckIfGameIsOver();
             }
             catch (Exception ex)
             {
