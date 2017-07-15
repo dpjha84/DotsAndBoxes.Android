@@ -9,9 +9,11 @@ using Android.OS;
 using DotsAndBoxesFun;
 using TMP2.Droid;
 using Android.Media;
+using Android.Content;
 
 [assembly: Xamarin.Forms.Dependency(typeof(MessageAndroid))]
 [assembly: Xamarin.Forms.Dependency(typeof(AudioService))]
+[assembly: Xamarin.Forms.Dependency(typeof(AndroidUserPreferences))]
 namespace TMP2.Droid
 {
     [Activity(Label = "Dots and Boxes Fun", Icon = "@drawable/icon", Theme = "@style/MainTheme", MainLauncher = false, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
@@ -80,6 +82,28 @@ namespace TMP2.Droid
             mp.Completion -= mediaPlayer_Completion;
             mp.Release();
         }
-    }   
+    }
+
+    public class AndroidUserPreferences : IUserPreferences
+    {
+        public void SetString(string key, string value)
+        {
+            var prefs = global::Android.App.Application.Context.GetSharedPreferences("MySharedPrefs", FileCreationMode.Private);
+            var prefEditor = prefs.Edit();
+
+            prefEditor.PutString(key, value);
+            prefEditor.Commit();
+        }
+
+        public string GetString(string key)
+        {
+            var prefs = global::Android.App.Application.Context.GetSharedPreferences("MySharedPrefs", FileCreationMode.Private);
+            if (prefs.Contains(key))
+            {
+                return prefs.GetString(key, "");
+            }
+            return "";
+        }
+    }
 }
 

@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -14,7 +16,8 @@ namespace DotsAndBoxesFun
 
     public partial class MainPage : MasterDetailPage
     {
-        public ObservableCollection<MasterPageItem> menuList { get; set; }
+        public ObservableCollection<MasterPageItem> allMenuList { get; set; }
+        public ObservableCollection<MasterPageItem> expandedMenuList { get; set; }
         Entry entry = new Entry();
 
         int currentBoardSize = 6;
@@ -29,47 +32,99 @@ namespace DotsAndBoxesFun
             entry.Placeholder = "Settings updated.";
             entry.HorizontalOptions = LayoutOptions.Center;
 
-            menuList = new ObservableCollection<MasterPageItem>();
+            allMenuList = new ObservableCollection<MasterPageItem>();
+            expandedMenuList = new ObservableCollection<MasterPageItem>();
 
             // Creating our pages for menu navigation
             // Here you can define title for item, 
             // icon on the left side, and page that you want to open after selection
             //var page1 = new MasterPageItem() { Title = "Item 1", Icon = "itemIcon1.png", TargetType = typeof(Test1) };
             BuildMenu();
-
+            UpdateListContent();
             // Setting our list to be ItemSource for ListView in MainPage.xaml
-            navigationDrawerList.ItemsSource = menuList;
+            //navigationDrawerList.ItemsSource = allMenuList;
+            //gameMode.ItemsSource = gameModeList;
+            //navigationDrawerList1.ItemsSource = menuList;
+            LaunchGame();
+        }
 
-            // Initial navigation, this can be used for our home page
+        private void UpdateListContent()
+        {
+            expandedMenuList.Clear();
+            foreach (var item in allMenuList)
+            {
+                var newGroup = new MasterPageItem(item.Title, item.ShortName, item.Expanded);
+                newGroup.ItemCount = item.ItemCount;
+                if (item.Expanded)
+                {
+                    foreach (var group in item)
+                    {
+                        newGroup.Add(group);
+                    }
+                }
+                expandedMenuList.Add(newGroup);
+            }
+            navigationDrawerList.ItemsSource = expandedMenuList;
+        }
+
+        public void LaunchGame()
+        {
             Detail = new NavigationPage(StartGame());
         }
 
         private void BuildMenu()
         {
-            var page1 = new MasterPageItem() { Id = 1, Title = "New Game", Icon = "itemIcon5.png" };
-            var page2 = new MasterPageItem() { Id = 2, Title = "Board size", Icon = "itemIcon2.png", CurrentValue = "6x6" };
-            var page3 = new MasterPageItem() { Id = 3, Title = "Difficulty level", Icon = "itemIcon3.png", CurrentValue = "Medium" };
-            var page4 = new MasterPageItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png", CurrentValue = "You" };
-            var page5 = new MasterPageItem() { Id = 5, Title = "Sound", Icon = "sound.png", CurrentValue = "On" };
-            var page6 = new MasterPageItem() { Id = 6, Title = "Give Feedback", Icon = "feedback.png", CurrentValue = "" };
+            ReadSetting();
+            var page1 = new SubItem() { Id = 1, Title = "New Game", Icon = "itemIcon5.png", CurrentValue="Test"};
+            var page2 = new SubItem() { Id = 2, Title = "Board size", Icon = "itemIcon2.png", CurrentValue = $"{currentBoardSize}x{currentBoardSize}" };
+            var page3 = new SubItem() { Id = 3, Title = "Difficulty level", Icon = "itemIcon3.png", CurrentValue = currentDifficulyLevel.ToString() };
+            var page4 = new SubItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png", CurrentValue = currentFirstMove ? "CPU" : "You" };
 
-            menuList.Add(page1);
-            menuList.Add(page2);
-            menuList.Add(page3);
-            menuList.Add(page4);
-            menuList.Add(page5);
-            menuList.Add(page6);
+            var page5 = new SubItem() { Id = 5, Title = "Sound", Icon = "sound.png", CurrentValue = IsMute ? "Off" : "On" };
+            var page6 = new SubItem() { Id = 6, Title = "Give Feedback", Icon = "feedback.png", CurrentValue = "ss" };
+
+            var page7 = new SubItem() { Id = 7, Title = "Game mode", Icon = "feedback.png", CurrentValue = "Classic" };
+            var page8 = new SubItem() { Id = 8, Title = "Current Level", Icon = "feedback.png", CurrentValue = "1" };
+
+            allMenuList.Add(new MasterPageItem("Game Mode", "") { page7 });
+            allMenuList.Add(new MasterPageItem("Modern Game", "") { page8 });
+            allMenuList.Add(new MasterPageItem("Classic Game", "test2") { page1, page2, page3, page4});
+            allMenuList.Add(new MasterPageItem("", "test4") { page5 });
+            allMenuList.Add(new MasterPageItem("", "test4") { page6 });
+        }
+
+        private void ReadSetting()
+        {
+            var data = DependencyService.Get<IUserPreferences>().GetString("BoardSize");
+            if (!string.IsNullOrWhiteSpace(data))
+                currentBoardSize = int.Parse(data);
+
+            data = DependencyService.Get<IUserPreferences>().GetString("DifficulyLevel");
+            if (!string.IsNullOrWhiteSpace(data))
+                currentDifficulyLevel = (DifficulyLevel)Enum.Parse(typeof(DifficulyLevel), data);
+
+            data = DependencyService.Get<IUserPreferences>().GetString("FirstMove");
+            if (!string.IsNullOrWhiteSpace(data))
+                currentFirstMove = bool.Parse(data);
+
+            data = DependencyService.Get<IUserPreferences>().GetString("IsMute");
+            if (!string.IsNullOrWhiteSpace(data))
+                IsMute = bool.Parse(data);
         }
 
         private void RebuildMenu(int id, string newValue)
         {
-            MasterPageItem page1, page2, page3, page4, page5, page6;
-            page1 = new MasterPageItem() { Id = 1, Title = "New Game", Icon = "itemIcon5.png" };
-            page2 = new MasterPageItem() { Id = 2, Title = "Board size", Icon = "itemIcon2.png", CurrentValue = menuList[1].CurrentValue };
-            page3 = new MasterPageItem() { Id = 3, Title = "Difficulty level", Icon = "itemIcon3.png", CurrentValue = menuList[2].CurrentValue };
-            page4 = new MasterPageItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png",CurrentValue = menuList[3].CurrentValue };
-            page5 = new MasterPageItem() { Id = 5, Title = "Sound", Icon = "sound.png", CurrentValue = menuList[4].CurrentValue };
-            page6 = new MasterPageItem() { Id = 6, Title = "Give Feedback", Icon = "feedback.png", CurrentValue = menuList[5].CurrentValue };
+            SubItem page1, page2, page3, page4, page5, page6, page7, page8;
+            page1 = new SubItem() { Id = 1, Title = "New Game", Icon = "itemIcon5.png", CurrentValue = "Test" };
+            page2 = new SubItem() { Id = 2, Title = "Board size", Icon = "itemIcon2.png", CurrentValue = allMenuList[0][1].CurrentValue };
+            page3 = new SubItem() { Id = 3, Title = "Difficulty level", Icon = "itemIcon3.png", CurrentValue = allMenuList[0][2].CurrentValue };
+            page4 = new SubItem() { Id = 4, Title = "First move", Icon = "itemIcon4.png", CurrentValue = allMenuList[0][3].CurrentValue };
+
+            page5 = new SubItem() { Id = 5, Title = "Sound", Icon = "sound.png", CurrentValue = allMenuList[1][0].CurrentValue };
+            page6 = new SubItem() { Id = 6, Title = "Give Feedback", Icon = "feedback.png", CurrentValue = "ss" };
+
+            page7 = new SubItem() { Id = 7, Title = "Game mode", Icon = "feedback.png", CurrentValue = allMenuList[1][2].CurrentValue };
+            page8 = new SubItem() { Id = 8, Title = "Current Level", Icon = "feedback.png", CurrentValue = "1" };
 
             if (id == 2)
                 page2.CurrentValue = newValue;
@@ -80,14 +135,12 @@ namespace DotsAndBoxesFun
             else if (id == 5)
                 page5.CurrentValue = newValue;
 
-            menuList.Clear();
-
-            menuList.Add(page1);
-            menuList.Add(page2);
-            menuList.Add(page3);
-            menuList.Add(page4);
-            menuList.Add(page5);
-            menuList.Add(page6);
+            allMenuList.Clear();
+            allMenuList.Add(new MasterPageItem("Game Mode", "") { page7 });
+            allMenuList.Add(new MasterPageItem("Modern Game", "") { page8 });
+            allMenuList.Add(new MasterPageItem("Classic Game", "test2") { page1, page2, page3, page4 });
+            allMenuList.Add(new MasterPageItem("", "test4") { page5 });
+            allMenuList.Add(new MasterPageItem("", "test4") { page6 });
         }
 
         private string[] GetButtons(int menuId)
@@ -139,9 +192,9 @@ namespace DotsAndBoxesFun
             {
                 if (e.SelectedItem == null) return;
                 navigationDrawerList.SelectedItem = null;
-                if ((e.SelectedItem as MasterPageItem).Id == 1)
+                if ((e.SelectedItem as SubItem).Id == 1)
                     Detail = new NavigationPage(StartGame());
-                else if ((e.SelectedItem as MasterPageItem).Id == 2)
+                else if ((e.SelectedItem as SubItem).Id == 2)
                 {
                     var action = await DisplayActionSheet("Choose Board size", "Cancel", null, GetButtons(1));
                     if (action == null || action == "Cancel") return;
@@ -153,7 +206,7 @@ namespace DotsAndBoxesFun
                     Detail = new NavigationPage(StartGame());
                     XFToast.LongMessage($"Board size is set to {action}");
                 }
-                else if ((e.SelectedItem as MasterPageItem).Id == 3)
+                else if ((e.SelectedItem as SubItem).Id == 3)
                 {
                     var action = await DisplayActionSheet("Choose Difficulty level", "Cancel", null, GetButtons(2));
 
@@ -166,7 +219,7 @@ namespace DotsAndBoxesFun
                     Detail = new NavigationPage(StartGame());
                     XFToast.LongMessage($"Difficulty level is set to {currentDifficulyLevel.ToString()}");
                 }
-                else if ((e.SelectedItem as MasterPageItem).Id == 4)
+                else if ((e.SelectedItem as SubItem).Id == 4)
                 {
                     var action = await DisplayActionSheet("Choose who should move first", "Cancel", null, GetButtons(3));
 
@@ -180,19 +233,20 @@ namespace DotsAndBoxesFun
                     Detail = new NavigationPage(StartGame());
                     XFToast.LongMessage($"First move is set to {action}");
                 }
-                else if ((e.SelectedItem as MasterPageItem).Id == 5)
+                else if ((e.SelectedItem as SubItem).Id == 5)
                 {
                     IsMute = currentGame.IsMute = !currentGame.IsMute;
                     string newValue = currentGame.IsMute ? "Off" : "On";
                     RebuildMenu(5, newValue);
                     XFToast.LongMessage($"Sound is {newValue}");
                 }
-                else if ((e.SelectedItem as MasterPageItem).Id == 6)
+                else if ((e.SelectedItem as SubItem).Id == 6)
                 {
                     Device.OpenUri(new Uri("https://play.google.com/store/apps/details?id=com.game.dotsandboxesfun"));
                 }
                     //Detail = new NavigationPage(new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove));
                 IsPresented = false;
+                UpdateListContent();
             }
             catch(Exception ex)
             {
@@ -202,12 +256,70 @@ namespace DotsAndBoxesFun
         
         private Test1 StartGame()
         {
-            currentGame = new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove, IsMute);
+            DependencyService.Get<IUserPreferences>().SetString("BoardSize", currentBoardSize.ToString()); 
+            DependencyService.Get<IUserPreferences>().SetString("DifficulyLevel", currentDifficulyLevel.ToString());
+            DependencyService.Get<IUserPreferences>().SetString("FirstMove", currentFirstMove.ToString());
+            DependencyService.Get<IUserPreferences>().SetString("IsMute", IsMute.ToString());
+            currentGame = new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove, IsMute, this);
             return currentGame;
+        }
+
+        private void gameMode_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {
+
+        }
+
+        private void Button_Clicked(object sender, EventArgs e)
+        {
+            int selectedIndex = expandedMenuList.IndexOf(((MasterPageItem)((Button)sender).CommandParameter));
+            allMenuList[selectedIndex].Expanded = !allMenuList[selectedIndex].Expanded;
+            UpdateListContent();
         }
     }
 
-    public class MasterPageItem
+    public class MasterPageItem : ObservableCollection<SubItem>, INotifyPropertyChanged
+    {
+        public MasterPageItem(string title, string shortName, bool expanded = true)
+        {
+            Title = title;
+            ShortName = shortName;
+            Expanded = expanded;
+        }
+        bool _expanded;
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string ShortName { get; set; }
+        public int ItemCount { get; set; }
+        public string TitleWithItemCount { get { return $"{Title} {ItemCount}";} }
+        public string StateIcon { get { return Expanded ? "feedback.png" : "sound.png"; } }
+        public bool Expanded
+        {
+            get
+            {
+                return _expanded;
+            }
+            set
+            {
+                if (_expanded != value)
+                {
+                    _expanded = value;
+                    //RaisePropertyChanged("Expanded");
+                    //RaisePropertyChanged("StateIcon");
+                }
+            }
+        }
+        public string Icon { get; set; }
+
+        protected void RaisePropertyChanged([CallerMemberName]string propertyName = null)
+        {
+            //var evt = PropertyChanged;   // create local copy in case the reference is replaced
+            //if (evt != null)             // check if there are any subscribers
+               // PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class SubItem
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -238,5 +350,11 @@ namespace DotsAndBoxesFun
     public interface IAudio
     {
         void PlayAudioFile(string fileName);
+    }
+
+    public interface IUserPreferences
+    {
+        void SetString(string key, string value);
+        string GetString(string key);
     }
 }

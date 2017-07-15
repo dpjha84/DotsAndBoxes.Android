@@ -41,8 +41,9 @@ namespace DotsAndBoxesFun.Views
         };
 
         public bool IsMute { get; set; }
+        public MainPage Parent { get; set; }
 
-        public Test1(int boardSize, DifficulyLevel level, bool moveFirst, bool isMute)
+        public Test1(int boardSize, DifficulyLevel level, bool moveFirst, bool isMute, MainPage parent)
         {
             this.InitializeComponent();
             grid.SizeChanged += (object sender, EventArgs e) =>
@@ -63,6 +64,7 @@ namespace DotsAndBoxesFun.Views
             this.moveFirst = moveFirst;
             this.level = level;
             IsMute = isMute;
+            Parent = parent;
             NewGame();
         }
 
@@ -235,10 +237,19 @@ namespace DotsAndBoxesFun.Views
             if (end)
             {
                 prevCompRect.BackgroundColor = Constants.compColor;
+                bool choice = false;
                 if (player1Score == player2Score)
-                    DisplayAlert("Game over!", "Game is tied. Try again!", "OK");
+                {
+                    choice = await DisplayAlert("Game over!", "Game is tied. Play another game?", "Yes", "No");
+                }
                 else
-                    DisplayAlert("Game over!", player1Score > player2Score ? "You won!" : "You lost. Try again!", "OK");
+                {
+                    choice = await DisplayAlert("Game over!", player1Score > player2Score ? "You won! Play another game?" : "You lost. Play another game?", "Yes", "No");
+                }
+                if (choice)
+                {
+                    Parent.LaunchGame();
+                }
             }
         }
 
@@ -722,8 +733,8 @@ namespace DotsAndBoxesFun.Views
                     {
                         await CompMove();
                     }
-
-                    CheckIfGameIsOver();
+                    else
+                        CheckIfGameIsOver();
                 }
             }
             catch (Exception ex)
