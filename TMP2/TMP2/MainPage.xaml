@@ -5,40 +5,45 @@
               x:Class="DotsAndBoxesFun.MainPage">
 
     <MasterDetailPage.Master>
-        <ContentPage Title="Menu" BackgroundColor="#e8e8e8">
+        <ContentPage Title="Menu"
+                 BackgroundColor="#e8e8e8">
+
             <StackLayout Orientation="Vertical">
-                <StackLayout BackgroundColor="#e74c3c" HeightRequest="60">
-                    <Label Text="Settings" FontSize="20" VerticalOptions="CenterAndExpand" TextColor="White" HorizontalOptions="StartAndExpand" Margin="20, 0, 0, 0"/>
+
+                <!-- 
+             This StackLayout you can use for other
+             data that you want to have in your menu drawer
+        -->
+                <StackLayout BackgroundColor="#e74c3c"
+                     HeightRequest="60">
+
+                    <Label Text="Settings" FontSize="20"
+                 VerticalOptions="CenterAndExpand"
+                 TextColor="White"
+                 HorizontalOptions="StartAndExpand" Margin="20, 0, 0, 0"/>
                 </StackLayout>
-                
-                <ListView x:Name="navigationDrawerList" RowHeight="25" BackgroundColor="#d8e8e8" HasUnevenRows="True"
-                          ItemSelected="OnMenuItemSelected" IsGroupingEnabled="True" GroupDisplayBinding="{Binding Title}" GroupShortNameBinding="{Binding ShortName}">
+
+                <ListView x:Name="navigationDrawerList"
+                  RowHeight="50"
+                  SeparatorVisibility="Default"
+                  BackgroundColor="#e8e8e8"
+                          ItemSelected="OnMenuItemSelected">
+
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
+                                <!-- Main design for our menu items -->
                                 <StackLayout VerticalOptions="FillAndExpand" Orientation="Horizontal" Padding="20,10,0,10" Spacing="0">
-                                    <Image Source="{Binding Icon}" WidthRequest="25" HeightRequest="20" VerticalOptions="Center" />
-                                    <Label Text="{Binding Title}" FontSize="14" VerticalOptions="Center" TextColor="Black"/>
-                                    <Label Text="{Binding CurrentValue}" FontSize="12" HorizontalOptions="EndAndExpand" Margin="0,0,10,0" VerticalOptions="Center" TextColor="Gray"/>
+                                    <Image Source="{Binding Icon}" WidthRequest="40" HeightRequest="40" VerticalOptions="Center" />
+                                    <Label Text="{Binding Title}" FontSize="15" VerticalOptions="Center" TextColor="Black"/>
+                                    <Label Text="{Binding CurrentValue}" FontSize="Small" HorizontalOptions="EndAndExpand" Margin="0,0,10,0" VerticalOptions="Center" TextColor="Gray"/>
                                 </StackLayout>
                             </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
-                    <ListView.GroupHeaderTemplate>
-                        <DataTemplate>
-                            <ViewCell Height="0">
-                                <Grid/>
-                            </ViewCell>
-                            <!--<ViewCell>
-                                <StackLayout Orientation="Horizontal">
-                                    <Button Image="{Binding StateIcon}" BackgroundColor="Transparent" BorderColor="Transparent" BorderWidth="0" Clicked="Button_Clicked" CommandParameter="{Binding .}" />
-                                    <Label Text="{Binding TitleWithItemCount}" TextColor="#005569" FontSize="15" VerticalOptions="Center" />
-                                </StackLayout>
-                            </ViewCell>-->
-                        </DataTemplate>
-                    </ListView.GroupHeaderTemplate>
-                </ListView>                
+                </ListView>
             </StackLayout>
+
         </ContentPage>
     </MasterDetailPage.Master>
 

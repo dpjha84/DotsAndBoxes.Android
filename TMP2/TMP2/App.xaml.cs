@@ -11,9 +11,16 @@ namespace DotsAndBoxesFun
     {
         public App()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            MainPage = new DotsAndBoxesFun.MainPage();
+                MainPage = new DotsAndBoxesFun.MainPage();
+            }
+            catch (Exception)
+            {
+
+            }            
         }
 
         protected override void OnStart()
