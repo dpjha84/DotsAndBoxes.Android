@@ -29,6 +29,18 @@ namespace TMP2.Droid
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());
         }
+
+        protected override void OnDestroy()
+        {
+            try
+            {
+                base.OnDestroy();
+            }
+            catch (Exception ex)
+            {
+            }
+            
+        }
     }
 
     [Activity(Theme = "@style/Theme.Splash", //Indicates the theme to use for this activity
