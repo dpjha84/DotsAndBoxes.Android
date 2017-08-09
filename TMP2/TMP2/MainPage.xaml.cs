@@ -24,7 +24,7 @@ namespace DotsAndBoxesFun
         Test1 currentGame;
         public MainPage()
         {
-            InitializeComponent();
+            //InitializeComponent();
 
             entry.Placeholder = "Settings updated.";
             entry.HorizontalOptions = LayoutOptions.Center;
@@ -38,7 +38,7 @@ namespace DotsAndBoxesFun
             BuildMenu();
 
             // Setting our list to be ItemSource for ListView in MainPage.xaml
-            navigationDrawerList.ItemsSource = menuList;
+            //navigationDrawerList.ItemsSource = menuList;
 
             LaunchGame();
             // Initial navigation, this can be used for our home page
@@ -164,7 +164,7 @@ namespace DotsAndBoxesFun
             try
             {
                 if (e.SelectedItem == null) return;
-                navigationDrawerList.SelectedItem = null;
+                //navigationDrawerList.SelectedItem = null;
                 if ((e.SelectedItem as MasterPageItem).Id == 1)
                     Detail = new NavigationPage(StartGame());
                 else if ((e.SelectedItem as MasterPageItem).Id == 2)
@@ -232,7 +232,7 @@ namespace DotsAndBoxesFun
             DependencyService.Get<IUserPreferences>().SetString("DifficulyLevel", currentDifficulyLevel.ToString());
             DependencyService.Get<IUserPreferences>().SetString("FirstMove", currentFirstMove.ToString());
             DependencyService.Get<IUserPreferences>().SetString("IsMute", IsMute.ToString());
-            currentGame = new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove, IsMute, this);
+            //currentGame = new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove, IsMute, this);
             return currentGame;
         }
     }

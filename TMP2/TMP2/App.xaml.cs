@@ -15,7 +15,7 @@ namespace DotsAndBoxesFun
             {
                 InitializeComponent();
 
-                MainPage = new DotsAndBoxesFun.MainPage();
+                MainPage = new NavigationPage(new Views.HomePage());
             }
             catch (Exception)
             {

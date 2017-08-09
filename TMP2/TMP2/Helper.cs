@@ -8,6 +8,7 @@ namespace DotsAndBoxesFun
 {
     public static class Constants
     {
+        public static bool restartGame = false;
         public static Color compColor = Color.FromHex("#D13A1B");
         public static Color playerColor = Color.FromHex("#12B504");
         public static Color compPrevColor = Color.FromHex("#DBB312");

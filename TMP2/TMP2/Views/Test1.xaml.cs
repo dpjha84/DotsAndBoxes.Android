@@ -41,9 +41,9 @@ namespace DotsAndBoxesFun.Views
         };
 
         public bool IsMute { get; set; }
-        public MainPage Parent { get; set; }
+        public HomePage Parent { get; set; }
 
-        public Test1(int boardSize, DifficulyLevel level, bool moveFirst, bool isMute, MainPage parent)
+        public Test1(int boardSize, DifficulyLevel level, bool moveFirst, bool isMute, HomePage parent)
         {
             this.InitializeComponent();
             grid.SizeChanged += (object sender, EventArgs e) =>
@@ -248,6 +248,7 @@ namespace DotsAndBoxesFun.Views
                 }
                 if (choice)
                 {
+                    //Constants.restartGame = true;
                     Parent.LaunchGame();
                 }
             }
@@ -741,6 +742,47 @@ namespace DotsAndBoxesFun.Views
             {
 
             }
-        }        
+        }
+
+        private void MenuItem1_Clicked(object sender, EventArgs e)
+        {
+            Application.Current.MainPage = new NavigationPage(new HomePage());
+        }
+        //int currentBoardSize = 6;
+        private async void MenuItem2_Clicked(object sender, EventArgs e)
+        {
+            var action = await DisplayActionSheet("Choose Board size", "Cancel", null, GetButtons(1));
+            if (action == null || action == "Cancel") return;
+            action = action.Replace("» ", "").Trim();
+            int newBoardSize = Convert.ToInt32(action.Split('x')[0]);
+            if (newBoardSize == count) return;
+            count = newBoardSize;
+            //RebuildMenu(2, action);
+            Application.Current.MainPage = new NavigationPage(new Test1(2, DifficulyLevel.Medium, false, false, Parent));
+            //Detail = new NavigationPage(StartGame());
+            XFToast.LongMessage($"Board size is set to {action}");
+        }
+
+        private string[] GetButtons(int v)
+        {
+            string[] buttons = new string[5];
+            int b = 0;
+            for (int i = 5; i <= 9; i++)
+            {
+                buttons[b++] = (count == i) ? $"» {i}x{i}" : $"  {i}x{i}";
+            }
+            return buttons;
+        }
+
+        private Test1 StartGame()
+        {
+            //DependencyService.Get<IUserPreferences>().SetString("BoardSize", currentBoardSize.ToString());
+            //DependencyService.Get<IUserPreferences>().SetString("DifficulyLevel", currentDifficulyLevel.ToString());
+            //DependencyService.Get<IUserPreferences>().SetString("FirstMove", currentFirstMove.ToString());
+            //DependencyService.Get<IUserPreferences>().SetString("IsMute", IsMute.ToString());
+            ////currentGame = new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove, IsMute, this);
+            //return currentGame;
+            return null;
+        }
     }
 }
