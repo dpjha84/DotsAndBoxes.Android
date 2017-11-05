@@ -6,13 +6,20 @@ using System.Linq;
 
 namespace DotsAndBoxesFun
 {
+    public class Player
+    {
+        public int Score { get; set; }
+        public Color BackgroundColor { get; set; }
+        public string SoundFile { get; set; }
+    }
+
     public static class Constants
     {
         public static bool restartGame = false;
         public static Color compColor = Color.FromHex("#D13A1B");
         public static Color playerColor = Color.FromHex("#12B504");
         public static Color compPrevColor = Color.FromHex("#DBB312");
-
+        public static int StarRequired = 5;
         public static bool IsFilled(this BoxView shape)
         {
             return shape.BackgroundColor == compColor || shape.BackgroundColor == playerColor || shape.BackgroundColor == compPrevColor;

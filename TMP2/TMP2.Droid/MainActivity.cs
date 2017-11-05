@@ -1,15 +1,16 @@
 ﻿using System;
-
 using Android.App;
 using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
 using Android.Widget;
 using Android.OS;
 using DotsAndBoxesFun;
 using TMP2.Droid;
 using Android.Media;
 using Android.Content;
+using Android.Gms.Ads;
+using Xamarin.Forms;
+using Xamarin.Forms.Platform.Android;
+using DotsAndBoxesFun.Views;
 
 [assembly: Xamarin.Forms.Dependency(typeof(MessageAndroid))]
 [assembly: Xamarin.Forms.Dependency(typeof(AudioService))]
@@ -22,10 +23,10 @@ namespace TMP2.Droid
         protected override void OnCreate(Bundle bundle)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;
+            ToolbarResource = Resource.Layout.Toolbar;            
 
             base.OnCreate(bundle);
-
+            MobileAds.Initialize(ApplicationContext, "ca-app-pub-9351754143985661~5042360432");
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());
         }
@@ -36,7 +37,7 @@ namespace TMP2.Droid
             {
                 base.OnDestroy();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             
@@ -60,12 +61,12 @@ namespace TMP2.Droid
     {
         public void LongAlert(string message)
         {
-            Toast.MakeText(Application.Context, message, ToastLength.Long).Show();
+            Toast.MakeText(Android.App.Application.Context, message, ToastLength.Long).Show();
         }
 
         public void ShortAlert(string message)
         {
-            Toast.MakeText(Application.Context, message, ToastLength.Short).Show();
+            Toast.MakeText(Android.App.Application.Context, message, ToastLength.Short).Show();
         }
     }
 

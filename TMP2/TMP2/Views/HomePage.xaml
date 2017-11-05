@@ -1,13 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="DotsAndBoxesFun.Views.HomePage">
+             xmlns:local="clr-namespace:DotsAndBoxesFun.Views"
+             xmlns:controls="clr-namespace:MeetupManager.Controls;assembly=DotsAndBoxesFun"
+             x:Class="DotsAndBoxesFun.Views.HomePage"
+             NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
-        <StackLayout>
-            <Button Text="Classic" Clicked="BtnClassic_Clicked" />
-            <Button Text="Challenge" />
-            <Button Text="How to Play" />
-            <Button Text="Settings" />
+        
+        <!--<ScrollView>-->
+            <StackLayout VerticalOptions="Start" Margin="0,10,0,0" >
+                <Image Source="splash" />
+                <Label Text="Dots and Boxes Fun!" FontAttributes="Bold" TextColor="#E25151" FontSize="Large" HorizontalOptions="CenterAndExpand" />
+                <Button Text="Classic" Clicked="BtnClassic_Clicked"  BackgroundColor="#3f51b5" TextColor="White"/>
+                <Button Text="Challenge" Clicked="BtnChallange_Clicked"  BackgroundColor="#3f51b5" TextColor="White"/>
+                <Button Text="How to Play" Clicked="ButtonHowToPlay_Clicked"  BackgroundColor="#3f51b5" TextColor="White"/>
+                <Button Text="Settings" Clicked="ButtonSetting_Clicked"  BackgroundColor="#3f51b5" TextColor="White"/>
+            <Grid RowSpacing="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ListView Grid.Row="0"/>
+                <controls:AdControlView Grid.Row="1"/>
+            </Grid>
         </StackLayout>
+        <!--</ScrollView>-->
     </ContentPage.Content>
 </ContentPage>

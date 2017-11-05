@@ -7,9 +7,9 @@ using Xamarin.Forms;
 
 namespace DotsAndBoxesFun
 {
-    public enum DifficulyLevel
+    public enum DifficultyLevel
     {
-        Easy, Medium, Hard
+        Easy, Medium, Hard, None
     };
 
     public partial class MainPage : MasterDetailPage
@@ -19,9 +19,9 @@ namespace DotsAndBoxesFun
 
         int currentBoardSize = 6;
         bool currentFirstMove = false;
-        DifficulyLevel currentDifficulyLevel = DifficulyLevel.Medium;
+        DifficultyLevel currentDifficulyLevel = DifficultyLevel.Medium;
         bool IsMute = false;
-        Test1 currentGame;
+        ClassicGame currentGame;
         public MainPage()
         {
             //InitializeComponent();
@@ -76,7 +76,7 @@ namespace DotsAndBoxesFun
 
             data = DependencyService.Get<IUserPreferences>().GetString("DifficulyLevel");
             if (!string.IsNullOrWhiteSpace(data))
-                currentDifficulyLevel = (DifficulyLevel)Enum.Parse(typeof(DifficulyLevel), data);
+                currentDifficulyLevel = (DifficultyLevel)Enum.Parse(typeof(DifficultyLevel), data);
 
             data = DependencyService.Get<IUserPreferences>().GetString("FirstMove");
             if (!string.IsNullOrWhiteSpace(data))
@@ -132,9 +132,9 @@ namespace DotsAndBoxesFun
             {
                 string[] buttons = new string[3];
                 int b = 0;
-                foreach (var level in Enum.GetValues(typeof(DifficulyLevel)))
+                foreach (var level in Enum.GetValues(typeof(DifficultyLevel)))
                 {
-                    buttons[b++] = (currentDifficulyLevel == (DifficulyLevel)level) ? $"» {level}" : $"  {level}";
+                    buttons[b++] = (currentDifficulyLevel == (DifficultyLevel)level) ? $"» {level}" : $"  {level}";
                 }
                 return buttons;
             }
@@ -184,7 +184,7 @@ namespace DotsAndBoxesFun
                     var action = await DisplayActionSheet("Choose Difficulty level", "Cancel", null, GetButtons(2));
 
                     if (action == null || action == "Cancel") return;
-                    var newDifficulyLevel = (DifficulyLevel)Enum.Parse(typeof(DifficulyLevel), action.Replace("» ", "").Trim());
+                    var newDifficulyLevel = (DifficultyLevel)Enum.Parse(typeof(DifficultyLevel), action.Replace("» ", "").Trim());
                     if (newDifficulyLevel == currentDifficulyLevel) return;
 
                     currentDifficulyLevel = newDifficulyLevel;
@@ -226,7 +226,7 @@ namespace DotsAndBoxesFun
             }
         }
 
-        private Test1 StartGame()
+        private ClassicGame StartGame()
         {
             DependencyService.Get<IUserPreferences>().SetString("BoardSize", currentBoardSize.ToString());
             DependencyService.Get<IUserPreferences>().SetString("DifficulyLevel", currentDifficulyLevel.ToString());

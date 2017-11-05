@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<d:GameBase xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MeetupManager.Controls;assembly=DotsAndBoxesFun"
+            xmlns:d="clr-namespace:DotsAndBoxesFun.Views;assembly=DotsAndBoxesFun"
+             x:Class="DotsAndBoxesFun.Views.ChallengeGame">
+  <ContentPage.Resources>
+    <ResourceDictionary>
+      <Style x:Key="LeftAligns" TargetType="Label">
+        <Setter Property="HorizontalTextAlignment" Value="Start"></Setter>
+        <Setter Property="FontSize" Value="Medium"></Setter>
+        <Setter Property="FontAttributes" Value="Bold"></Setter>
+      </Style>
+      <Style x:Key="RightAligns" TargetType="Label">
+        <Setter Property="HorizontalTextAlignment" Value="End"></Setter>
+        <Setter Property="FontSize" Value="Medium"></Setter>
+        <Setter Property="FontAttributes" Value="Bold"></Setter>
+      </Style>
+    </ResourceDictionary>
+  </ContentPage.Resources>
+    <ScrollView x:Name="scrollView">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="8,8,8,0" ColumnSpacing="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+              <Label x:Name="textPlayer1Name" Grid.Row="0" Grid.Column="0" Style="{StaticResource LeftAligns}"/>
+              <Label x:Name="textPlayer1Score" Grid.Row="0" Grid.Column="1" Style="{StaticResource RightAligns}"/>
+              <Label x:Name="textPlayer2Score" Grid.Row="0" Grid.Column="2" Style="{StaticResource LeftAligns}"/>
+              <Label x:Name="textPlayer2Name" Grid.Row="0" Grid.Column="3" Style="{StaticResource RightAligns}"/>
+                <BoxView x:Name="separator1" Grid.Row="1" Grid.ColumnSpan="4" />
+                <Grid x:Name="grid" VerticalOptions="Start" HorizontalOptions="Fill" Grid.Row="2" Grid.ColumnSpan="4" />
+                <BoxView x:Name="separator2" Grid.Row="3" Grid.ColumnSpan="4" />
+            </Grid>
+            <Grid RowSpacing="0" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ListView Grid.Row="0"/>
+                <controls:AdControlView Grid.Row="1"/>
+            </Grid>
+            <Grid BackgroundColor="#3f51b5" Grid.Row="2">
+            <Button x:Name="btnLevel" BackgroundColor="#3f51b5" Clicked="btnLevel_Clicked" TextColor="White" Text="L1" Grid.Row="0" Grid.Column="0" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand" FontAttributes="Bold" />
+            <Button x:Name="btnTarget" BackgroundColor="#3f51b5" TextColor="White" Text="19" Grid.Row="0" Grid.Column="1" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand" FontAttributes="Bold" />
+            <Button x:Name="btnCoin" BackgroundColor="#3f51b5" Image="ic_star" TextColor="White" Text="0" Grid.Row="0" Grid.Column="2" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand" FontAttributes="Bold" />
+        </Grid>
+        </Grid>
+    </ScrollView>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Name="btnHome"  Order="Primary" Icon="home.png" Text="Home" Priority="0" Clicked="btnHome_Clicked" />
+        <ToolbarItem Name="btnDummy1" Order="Primary" Text="" Priority="1" />
+        <ToolbarItem Name="btnNewGame" Order="Primary" Text="Restart" Icon="itemIcon3" Priority="2" Clicked="btnNewGame_Clicked" />
+        <ToolbarItem Name="btnDummy2" Order="Primary" Text="" Priority="3" />
+        <ToolbarItem x:Name="btnSound" Order="Primary" Text="Sound" Icon="sound" Priority="4" Clicked="btnSound_Clicked" />
+        <ToolbarItem Name="btnDummy3" Order="Primary" Text="" Priority="5" />
+        <ToolbarItem Name="btnFeedback" Order="Primary" Text="Feedback" Icon="feedback" Priority="6" Clicked="btnFeedback_Clicked" />
+    </ContentPage.ToolbarItems>
+</d:GameBase>
+
+    

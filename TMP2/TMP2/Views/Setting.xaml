@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DotsAndBoxesFun.Views.Setting">
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout Padding="8">
+                <Label Text="Player 1 Name" FontSize="Small" />
+                <Entry x:Name="ePlayer1Name"  Placeholder="Player1 Name" PlaceholderColor="#4B75DF" />
+                <Label Text="Player 2 Name" FontSize="Small" />
+                <Entry x:Name="ePlayer2Name" Placeholder="Player2 Name" PlaceholderColor="#4B75DF"/>
+                <Button x:Name="btnSave" Text="Save" Clicked="btnSave_Clicked" BackgroundColor="#3f51b5" TextColor="White"/>
+                <Button x:Name="btnResetClassic" Text="Reset Classic Mode" Clicked="btnResetClassic_Clicked" BackgroundColor="#3f51b5" TextColor="White"/>
+                <Button x:Name="btnResetChallange" Text="Reset Challange Mode" Clicked="btnResetChallange_Clicked" BackgroundColor="#3f51b5" TextColor="White"/>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

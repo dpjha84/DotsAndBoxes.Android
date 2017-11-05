@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,57 +12,40 @@ namespace DotsAndBoxesFun.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomePage : ContentPage
     {
-        int currentBoardSize = 1;
-        bool currentFirstMove = false;
-        DifficulyLevel currentDifficulyLevel = DifficulyLevel.Medium;
-        bool IsMute = false;
-        Test1 currentGame;
+        //IAdInterstitial adInterstitial;
 
         public HomePage()
         {
             InitializeComponent();
+            //adInterstitial = DependencyService.Get<IAdInterstitial>();
+            //adInterstitial.ShowAd();
+            //Setting.Reset();
         }
 
         private void BtnClassic_Clicked(object sender, EventArgs e)
         {
-            try
-            {
-                Application.Current.MainPage = new NavigationPage(new Test1(1, DifficulyLevel.Medium, false, false, this));
-            }
-            catch (Exception ex)
-            {
+            new ClassicGameRunner().Start();
+        }        
 
-            }
+        private void BtnChallange_Clicked(object sender, EventArgs e)
+        {
+            new ChallengeGameRunner().Start();
+        }
+
+        private void ButtonSetting_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new Setting());
             
-            //while (Constants.restartGame)
-            //{
-            //    Constants.restartGame = false;
-            //    Navigation.PopAsync();
-            //    Navigation.PushAsync(new Test1(1, DifficulyLevel.Medium, false, false, this), true);
-            //}
-            //MainPage =  new MainPage();
         }
 
-        public void LaunchGame()
+        private void ButtonHowToPlay_Clicked(object sender, EventArgs e)
         {
-            try
-            {
-                Application.Current.MainPage = new NavigationPage(StartGame());
-            }
-            catch (Exception ex)
-            {
-
-            }
+            Navigation.PushAsync(new HowToPlay());
         }
 
-        private Test1 StartGame()
-        {
-            DependencyService.Get<IUserPreferences>().SetString("BoardSize", currentBoardSize.ToString());
-            DependencyService.Get<IUserPreferences>().SetString("DifficulyLevel", currentDifficulyLevel.ToString());
-            DependencyService.Get<IUserPreferences>().SetString("FirstMove", currentFirstMove.ToString());
-            DependencyService.Get<IUserPreferences>().SetString("IsMute", IsMute.ToString());
-            currentGame = new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove, IsMute, this);
-            return currentGame;
-        }
+        //void Show_Interstitial(object sender, EventArgs e)
+        //{
+        //    adInterstitial.ShowAd();
+        //}
     }
 }

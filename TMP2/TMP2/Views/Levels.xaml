@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DotsAndBoxesFun.Views.Levels">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="EnabledStep" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#E8AD00"></Setter>
+                <Setter Property="FontSize" Value="24"></Setter>
+                <Setter Property="TextColor" Value="Black"></Setter>
+            </Style>
+            <Style x:Key="DisabledStep" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#ddd"></Setter>
+                <Setter Property="FontSize" Value="24"></Setter>
+                <Setter Property="TextColor" Value="Gray"></Setter>
+                <Setter Property="IsEnabled" Value="False"></Setter>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <ScrollView>
+            <Grid x:Name="grid" Padding="8" Grid.Row="0" BackgroundColor="Black">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+            <!--<Button Text="1" Grid.Row="0" Grid.Column="0" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="2" Grid.Row="0" Grid.Column="1" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="3" Grid.Row="0" Grid.Column="2" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="4" Grid.Row="1" Grid.Column="2" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="5" Grid.Row="1" Grid.Column="1" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="6" Grid.Row="1" Grid.Column="0" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="7" Grid.Row="2" Grid.Column="0" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="8" Grid.Row="2" Grid.Column="1" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="9" Grid.Row="2" Grid.Column="2" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="10" Grid.Row="3" Grid.Column="2" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="11" Grid.Row="3" Grid.Column="1" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="12" Grid.Row="3" Grid.Column="0" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="13" Grid.Row="4" Grid.Column="0" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="14" Grid.Row="4" Grid.Column="1" Style="{StaticResource DisabledStep}"></Button>
+            <Button Text="15" Grid.Row="4" Grid.Column="2" Style="{StaticResource DisabledStep}"></Button>-->
+        </Grid>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
