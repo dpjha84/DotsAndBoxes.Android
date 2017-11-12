@@ -11,6 +11,7 @@ namespace DotsAndBoxesFun
         public int Score { get; set; }
         public Color BackgroundColor { get; set; }
         public string SoundFile { get; set; }
+        public string Name { get; set; }
     }
 
     public static class Constants
@@ -99,9 +100,9 @@ namespace DotsAndBoxesFun
             }
         }
 
-        public void Fill()
+        public void Fill(Color color)
         {
-            Grid.BackgroundColor = Constants.playerColor;
+            Grid.BackgroundColor = color;
         }
     }
 
@@ -120,9 +121,9 @@ namespace DotsAndBoxesFun
             }
         }
 
-        public void Fill()
+        public void Fill(Color color)
         {
-            Shape.BackgroundColor = Constants.playerColor;
+            Shape.BackgroundColor = color;
         }
     }
 

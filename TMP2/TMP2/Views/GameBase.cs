@@ -78,12 +78,14 @@ namespace DotsAndBoxesFun.Views
             player1 = new Player
             {
                 BackgroundColor = Constants.playerColor,
-                SoundFile = player1Sound
+                SoundFile = player1Sound,
+                Name = "Player1"
             };
             player2 = new Player
             {
                 BackgroundColor = Constants.compColor,
-                SoundFile = player2Sound
+                SoundFile = player2Sound,
+                Name = "Player2"
             };
 
             IsMute = GlobalSetting.IsMute;
@@ -243,11 +245,11 @@ namespace DotsAndBoxesFun.Views
                             shape.BackgroundColor = player.BackgroundColor;
                             var house = houseDict[houseId];
                             var edge = house.Edges.Where(x => x.IsFilled == false).FirstOrDefault();
-                            edge.Fill();
+                            edge.Fill(player.BackgroundColor);
                             edge.House1.FilledCount++;
                             if (edge.House1.FilledCount == 4)
                             {
-                                edge.House1.Fill();
+                                edge.House1.Fill(player.BackgroundColor);
                                 Animate(edge.House1.Grid);
                                 UpdatePlayerScore();
                             }
@@ -256,7 +258,7 @@ namespace DotsAndBoxesFun.Views
                                 edge.House2.FilledCount++;
                                 if (edge.House2.FilledCount == 4)
                                 {
-                                    edge.House2.Fill();
+                                    edge.House2.Fill(player.BackgroundColor);
                                     Animate(edge.House2.Grid);
                                     UpdatePlayerScore();
                                 }
