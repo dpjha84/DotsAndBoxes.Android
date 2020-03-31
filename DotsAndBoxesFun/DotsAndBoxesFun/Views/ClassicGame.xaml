@@ -44,10 +44,10 @@
         <Grid RowSpacing="0" Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <!--<RowDefinition Height="Auto"/>-->
             </Grid.RowDefinitions>
             <ListView Grid.Row="0"/>
-            <controls:AdControlView Grid.Row="1"/>
+            <!--<controls:AdControlView Grid.Row="1"/>-->
         </Grid>
         <Grid x:Name="gridOption" BackgroundColor="#3f51b5" Grid.Row="2" RowSpacing="0">
             <Button x:Name="btnPlayerMode" BackgroundColor="#3f51b5" Clicked="btnPlayerMode_Clicked" TextColor="White" Text="1P" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" />

@@ -43,10 +43,10 @@
             <Grid RowSpacing="0" Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <!--<RowDefinition Height="Auto"/>-->
                 </Grid.RowDefinitions>
                 <ListView Grid.Row="0"/>
-                <controls:AdControlView Grid.Row="1"/>
+                <!--<controls:AdControlView Grid.Row="1"/>-->
             </Grid>
             <Grid BackgroundColor="#3f51b5" Grid.Row="2">
             <Button x:Name="btnLevel" BackgroundColor="#3f51b5" Clicked="btnLevel_Clicked" TextColor="White" Text="L1" Grid.Row="0" Grid.Column="0" VerticalOptions="StartAndExpand" HorizontalOptions="FillAndExpand" FontAttributes="Bold" />

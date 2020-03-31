@@ -18,10 +18,10 @@
             <Grid RowSpacing="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <!--<RowDefinition Height="Auto"/>-->
                 </Grid.RowDefinitions>
                 <ListView Grid.Row="0"/>
-                <controls:AdControlView Grid.Row="1"/>
+                <!--<controls:AdControlView Grid.Row="1"/>-->
             </Grid>
         </StackLayout>
         <!--</ScrollView>-->
