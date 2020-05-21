@@ -1,18 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:DotsAndBoxesFun.Controls;assembly=DotsAndBoxesFun"
              x:Class="DotsAndBoxesFun.Views.HowToPlay">
     <ContentPage.Content>
         <ScrollView>
-            <StackLayout Padding="8">
+        <Grid Margin="10,10,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="8*" />
+                <RowDefinition Height="2*" />
+            </Grid.RowDefinitions>
+            <StackLayout Grid.Row="0">
                 <Label Text="CLASSIC" FontAttributes="Bold" FontSize="Medium" TextColor="#3f51b5" />
                 <Label Text="Dots and Boxes Fun is a classic pencil and paper game that we have grownup playing." />
                 <Label Text="Starting with an empty grid of dots, two players take turns adding a single horizontals or vertical line between two unjoined adjacent dots. The player who completes the fourth side of a 1x1 box earns one point and takes another turn. The game ends when no more lines can be placed. The winner is the player with the most points." />
 
-                <Label Text="CHALLENGE" FontAttributes="Bold" FontSize="Medium" TextColor="#3f51b5"/>
-                <Label Text="This is an extension to Classic mode where you are given a challenge by achieving a target score." />
-                <Label Text="On achieving the target, you earn a star. On every additional point over target score, you earn another star. After every 3 levels you have a major level where you can enter only with 5 or more stars. If you win all 3 previous levels but could not earn 5 stars, you need to replay some of those levels to make 5 or more stars. On reaching every major level your previous star count becomes zero and you need to win all stars all over again." />
+                <Label Margin="0,30,0,0" Text="CHALLENGE" FontAttributes="Bold" FontSize="Medium" TextColor="#3f51b5"/>
+                <Label Text="This is an extension to Classic mode where you have to achieve a target score to win the game. Once target score is achieved you advances to next level." />
             </StackLayout>
+            <controls:AdmobControl Grid.Row="1" VerticalOptions="End" />
+        </Grid>
         </ScrollView>
     </ContentPage.Content>
 </ContentPage>

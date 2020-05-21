@@ -1,5 +1,7 @@
-﻿ using System;
+﻿using DotsAndBoxesFun.Controls;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,14 +14,10 @@ namespace DotsAndBoxesFun.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class HomePage : ContentPage
     {
-        //IAdInterstitial adInterstitial;
-
         public HomePage()
         {
             InitializeComponent();
-            //adInterstitial = DependencyService.Get<IAdInterstitial>();
-            //adInterstitial.ShowAd();
-            //Setting.Reset();
+            btnChallenge.Text += $" - Level {ChallengeGameSetting.ChallengeLevel}";
         }
 
         private void BtnClassic_Clicked(object sender, EventArgs e)
@@ -43,9 +41,19 @@ namespace DotsAndBoxesFun.Views
             Navigation.PushAsync(new HowToPlay());
         }
 
-        //void Show_Interstitial(object sender, EventArgs e)
-        //{
-        //    adInterstitial.ShowAd();
-        //}
+        async void ShowInterstitialAdsButton_Clicked(object sender, EventArgs e)
+        {
+            if (AppConstants.ShowAds)
+            {
+                await DependencyService.Get<IAdmobInterstitialAds>().Display(AppConstants.InterstitialAdId);
+            }
+
+            Debug.WriteLine("Continue button click implementation");
+        }
+
+        async void NavigateToPage2_Clicked(object sender, EventArgs e)
+        {
+            //await this.Navigation.PushAsync(new Page2());
+        }
     }
 }

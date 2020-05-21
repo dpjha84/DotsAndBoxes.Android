@@ -21,8 +21,7 @@ namespace DotsAndBoxesFun.Views
             this.level = ChallengeGameSetting.DifficultyLevel;
             btnTarget.Text = $"Target {ChallengeGameSetting.TargetScore.ToString()}";            
             IsMute = GlobalSetting.IsMute;
-            btnSound.Icon = IsMute ? "soundmute" : "sound";
-            btnCoin.Text = ChallengeGameSetting.StarCount.ToString();
+            btnSound.IconImageSource = IsMute ? "soundmute" : "sound";
             base.textPlayer1Name = textPlayer1Name;
             base.textPlayer2Name = textPlayer2Name;
             base.textPlayer1Score = textPlayer1Score;

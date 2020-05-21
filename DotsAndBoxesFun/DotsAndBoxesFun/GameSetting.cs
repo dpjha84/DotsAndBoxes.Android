@@ -250,7 +250,7 @@ namespace DotsAndBoxesFun
                 GlobalSetting.CurrentGameMode = GameMode.Challenge;
                 ChallengeGameSetting.RequestedChallengeLevel = requestedLevel == 0 ? ChallengeGameSetting.ChallengeLevel : requestedLevel;
                 ChallengeGameSetting.DifficultyLevel = (DifficultyLevel)((ChallengeGameSetting.RequestedChallengeLevel - 1) % 3);// == 0 ? 2 : (ChallengeGameSetting.ChallengeLevel % 3) - 1);
-                ChallengeGameSetting.TargetScore = (ChallengeGameSetting.BoardSize * ChallengeGameSetting.BoardSize)/2 + 1 + ((ChallengeGameSetting.RequestedChallengeLevel - 1) / 3);
+                ChallengeGameSetting.TargetScore = (ChallengeGameSetting.BoardSize * ChallengeGameSetting.BoardSize) / 2 + ChallengeGameSetting.RequestedChallengeLevel;
                 Application.Current.MainPage = new NavigationPage(new ChallengeGame());
             }
             catch (Exception ex)

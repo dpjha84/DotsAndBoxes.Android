@@ -13,22 +13,15 @@ namespace DotsAndBoxesFun.Views
         protected Label textPlayer2Name;
         protected Label textPlayer1Score;
         protected Label textPlayer2Score;
-        //protected Grid grid;
-        //public GameBase(Label textPlayer1Name, Label textPlayer2Name, Label textPlayer1Score, Label textPlayer2Score, Grid grid)
-        //{
-        //this.textPlayer1Name = textPlayer1Name;
-        //this.textPlayer2Name = textPlayer2Name;
-        //this.textPlayer1Score = textPlayer1Score;
-        //this.textPlayer2Score = textPlayer2Score;
-        //this.grid = grid;
-
-        //}
         protected Turn turn = Turn.Player1;
         protected int player1Score = 0;
         protected int player2Score = 0;
-        protected static Color vertexColor = Color.FromHex("#000063");
-        protected static Color edgeDefaultColor = Color.FromHex("#FAEDF0");
-        protected static Color edgeHoverColor = Color.FromHex("#6CCBE6");
+        //protected static Color vertexColor = Color.FromHex("#000063");
+        //protected static Color edgeDefaultColor = Color.FromHex("#FAEDF0");
+        //protected static Color edgeHoverColor = Color.FromHex("#6CCBE6");
+        protected static Color vertexColor = Color.FromHex("#000063");//0050EF
+        protected static Color edgeDefaultColor = Color.FromHex("#FAEDF0");//FAEDF0
+        //protected static Color edgeHoverColor = Color.FromHex("#6CCBE6");
         protected int count = 5;
         protected bool moveFirst = false;
         protected DifficultyLevel level = DifficultyLevel.Medium;
@@ -354,13 +347,13 @@ namespace DotsAndBoxesFun.Views
         {
             if (GetTurn() == Turn.Player1)
             {
-                textPlayer1Score.Text = $"{player1Score.ToString()}* ";
-                textPlayer2Score.Text = $" {player2Score.ToString()}";
+                textPlayer1Score.Text = $"{player1Score}* ";
+                textPlayer2Score.Text = $" {player2Score}";
             }
             else
             {
-                textPlayer2Score.Text = $" {player2Score.ToString()}*";
-                textPlayer1Score.Text = $"{player1Score.ToString()} ";
+                textPlayer2Score.Text = $" {player2Score}*";
+                textPlayer1Score.Text = $"{player1Score} ";
             }
         }
 
@@ -379,18 +372,24 @@ namespace DotsAndBoxesFun.Views
             {
                 prevCompRect.BackgroundColor = Constants.compColor;
                 bool choice = false;
-                if (player1Score == player2Score)
+                if (this is ClassicGame)
                 {
-                    choice = await DisplayAlert("Game over!", "Game is tied. Play another game?", "Yes", "No");
+                    if (player1Score == player2Score)
+                        choice = await DisplayAlert("Game over!", "Game is tied. Play another game?", "Yes", "No");
+                    else
+                        choice = await DisplayAlert("Game over!", player1Score > player2Score ? "You won! Play another game?" : "You lost. Play another game?", "Yes", "No");
+                    if (choice)
+                        new ClassicGameRunner().Start();
                 }
                 else
                 {
-                    choice = await DisplayAlert("Game over!", player1Score > player2Score ? "You won! Play another game?" : "You lost. Play another game?", "Yes", "No");
-                }
-                if (choice)
-                {
-                    //Constants.restartGame = true;
-                    new ClassicGameRunner().Start();
+                    choice = await DisplayAlert("Game over!", player1Score >= ChallengeGameSetting.TargetScore ?
+                        "You won! Play next level?" : "Target score not achieved, You lost! Try again?", "Yes", "No");
+
+                    if (player1Score >= ChallengeGameSetting.TargetScore)
+                        ChallengeGameSetting.ChallengeLevel++;
+                    if (choice)
+                        new ChallengeGameRunner().Start();
                 }
             }
         }
@@ -802,7 +801,14 @@ namespace DotsAndBoxesFun.Views
 
         protected void btnNewGame_Clicked(object sender, EventArgs e)
         {
-            new ClassicGameRunner().Start();
+            if (this is ClassicGame)
+            {
+                new ClassicGameRunner().Start();
+            }
+            else
+            {
+                new ChallengeGameRunner().Start();
+            }
         }
 
         protected void btnSound_Clicked(object sender, EventArgs e)
@@ -811,13 +817,13 @@ namespace DotsAndBoxesFun.Views
             IsMute = !IsMute;
             GlobalSetting.IsMute = IsMute;
             string newValue = IsMute ? "Off" : "On";
-            btnSound.Icon = IsMute ? "soundmute" : "sound";
+            btnSound.IconImageSource = IsMute ? "soundmute" : "sound";
             XFToast.LongMessage($"Sound is {newValue}");
         }
 
         protected void btnFeedback_Clicked(object sender, EventArgs e)
         {
-            Device.OpenUri(new Uri("https://play.google.com/store/apps/details?id=com.game.dotsandboxesfun"));
+            Device.OpenUri(new Uri("https://play.google.com/store/apps/details?id=com.game.dotsandboxesplus"));
         }
     }
 }

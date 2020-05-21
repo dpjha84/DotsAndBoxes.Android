@@ -17,9 +17,12 @@ namespace DotsAndBoxesFun
     public static class Constants
     {
         public static bool restartGame = false;
-        public static Color compColor = Color.FromHex("#D13A1B");
-        public static Color playerColor = Color.FromHex("#12B504");
-        public static Color compPrevColor = Color.FromHex("#DBB312");
+        //public static Color compColor = Color.FromHex("#D13A1B");
+        //public static Color playerColor = Color.FromHex("#12B504");
+        //public static Color compPrevColor = Color.FromHex("#DBB312");
+        public static Color compColor = Color.FromHex("#A20025");
+        public static Color playerColor = Color.FromHex("#60A917");
+        public static Color compPrevColor = Color.FromHex("#F0A30A");
         public static int StarRequired = 5;
         public static bool IsFilled(this BoxView shape)
         {

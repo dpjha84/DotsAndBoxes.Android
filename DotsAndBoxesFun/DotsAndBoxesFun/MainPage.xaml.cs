@@ -215,7 +215,7 @@ namespace DotsAndBoxesFun
                 }
                 else if ((e.SelectedItem as MasterPageItem).Id == 6)
                 {
-                    Device.OpenUri(new Uri("https://play.google.com/store/apps/details?id=com.game.dotsandboxesfun"));
+                    Device.OpenUri(new Uri("https://play.google.com/store/apps/details?id=com.game.dotsandboxesplus"));
                 }
                 //Detail = new NavigationPage(new Test1(currentBoardSize, currentDifficulyLevel, currentFirstMove));
                 IsPresented = false;

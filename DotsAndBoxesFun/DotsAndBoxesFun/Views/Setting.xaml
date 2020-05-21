@@ -1,10 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:DotsAndBoxesFun.Controls;assembly=DotsAndBoxesFun"
              x:Class="DotsAndBoxesFun.Views.Setting">
     <ContentPage.Content>
-        <ScrollView>
-            <StackLayout Padding="8">
+        <Grid Margin="10,10,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="8*" />
+                <RowDefinition Height="2*" />
+            </Grid.RowDefinitions>
+        <ScrollView Grid.Row="0">
+            <StackLayout>
                 <Label Text="Player 1 Name" FontSize="Small" />
                 <Entry x:Name="ePlayer1Name"  Placeholder="Player1 Name" PlaceholderColor="#4B75DF" />
                 <Label Text="Player 2 Name" FontSize="Small" />
@@ -14,5 +20,7 @@
                 <Button x:Name="btnResetChallange" Text="Reset Challange Mode" Clicked="btnResetChallange_Clicked" BackgroundColor="#3f51b5" TextColor="White"/>
             </StackLayout>
         </ScrollView>
+            <controls:AdmobControl Grid.Row="1" VerticalOptions="End" />
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
