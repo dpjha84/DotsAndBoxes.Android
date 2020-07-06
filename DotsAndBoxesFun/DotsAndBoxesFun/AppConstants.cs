@@ -33,9 +33,9 @@ namespace DotsAndBoxesFun
                 switch (Device.RuntimePlatform)
                 {
                     case Device.Android:
-                        return "ca-app-pub-9351754143985661/7162127076";
+                        return "ca-app-pub-9351754143985661/4193954438";//"ca-app-pub-3940256099942544/6300978111";//"ca-app-pub-9351754143985661/2277234543";
                     default:
-                        return "ca-app-pub-9351754143985661/7162127076";
+                        return "ca-app-pub-9351754143985661/4193954438";//"ca-app-pub-9351754143985661/2277234543";
                 }
             }
         }

@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Implementations\AdMobRenderer.cs" />
     <Compile Include="Implementations\InterstitialAdsImplementation.cs" />
+    <Compile Include="Implementations\TouchEffect.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

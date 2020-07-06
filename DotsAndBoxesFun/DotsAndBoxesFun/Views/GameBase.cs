@@ -65,8 +65,8 @@ namespace DotsAndBoxesFun.Views
             {
                 grid.HeightRequest = grid.Width;
             };
-            grid.ColumnSpacing = 3;
-            grid.RowSpacing = 3;
+            grid.ColumnSpacing = 1;
+            grid.RowSpacing = 1;
 
             player1 = new Player
             {
@@ -113,6 +113,7 @@ namespace DotsAndBoxesFun.Views
             }
 
             Xamarin.Forms.BoxView shape;
+            
             string id = "";
             int last = count * 2 + 1;
             for (int i = 0; i < last; i++)
@@ -131,9 +132,14 @@ namespace DotsAndBoxesFun.Views
                             shape.BackgroundColor = edgeDefaultColor;
                             houseDict.Add(++houseCount, new House(count) { Id = houseCount, Grid = shape });
                             shape.ClassId = string.Format("house_{0}_{1}", i, j);
-                            var tabGestureOrganiser1 = new TapGestureRecognizer();
-                            tabGestureOrganiser1.Tapped += EdgeClicked;
-                            shape.GestureRecognizers.Add(tabGestureOrganiser1);
+
+                            TouchEffect touchEffect1 = new TouchEffect();
+                            touchEffect1.TouchAction += EdgeClicked;
+                            shape.Effects.Add(touchEffect1);
+
+                            //var tabGestureOrganiser1 = new TapGestureRecognizer();
+                            //tabGestureOrganiser1.Tapped += EdgeClicked;
+                            //shape.GestureRecognizers.Add(tabGestureOrganiser1);
                         }
                         else
                             shape.ClassId = string.Format("vertex{0}{1}", i, j);
@@ -180,9 +186,14 @@ namespace DotsAndBoxesFun.Views
                         var edge = new Edge() { Shape = shape, Name = shape.ClassId };
                         shapeDict.Add(item, edge);
                     }
-                    var tabGestureOrganiser = new TapGestureRecognizer();
-                    tabGestureOrganiser.Tapped += EdgeClicked;
-                    shape.GestureRecognizers.Add(tabGestureOrganiser);
+                    //var tabGestureOrganiser = new TapGestureRecognizer();
+                    //tabGestureOrganiser.Tapped += EdgeClicked;
+
+                    TouchEffect touchEffect = new TouchEffect();
+                    touchEffect.TouchAction += EdgeClicked;
+                    shape.Effects.Add(touchEffect);
+
+                    //shape.GestureRecognizers.Add(tabGestureOrganiser);
                     Xamarin.Forms.Grid.SetRow(shape, i);
                     Xamarin.Forms.Grid.SetColumn(shape, j);
                     grid.Children.Add(shape);
@@ -212,16 +223,76 @@ namespace DotsAndBoxesFun.Views
             }
         }
 
-        async void EdgeClicked(object sender, EventArgs e)
+        //string tempColorClassId = null;
+
+        //bool Validate(BoxView shape, TouchActionEventArgs e)
+        //{
+        //    if (e.Type != TouchActionType.Released) return false;
+        //    if (e.Type == TouchActionType.Moved || e.Type == TouchActionType.Entered) return false;
+        //    if (e.Type == TouchActionType.Pressed)
+        //    {
+        //        if ((tempColorClassId != null && tempColorClassId != shape.ClassId) ||
+        //                shape.ClassId.StartsWith("house")) return false;
+        //        shape.BackgroundColor = Color.DarkGreen;
+        //        tempColorClassId = shape.ClassId;
+        //        return false;
+        //    }
+        //    else if (e.Type == TouchActionType.Exited || e.Type == TouchActionType.Cancelled ||
+        //        (e.Type == TouchActionType.Released && shape.BackgroundColor != Color.DarkGreen))
+        //    {
+        //        //if (!shape.ClassId.StartsWith("house"))
+        //        //{
+        //        Edge edge = shapeDict.Values.Where(x => x.Name == tempColorClassId).FirstOrDefault();
+        //        edge.Fill(edgeDefaultColor);
+        //        tempColorClassId = null;
+        //        return false;
+        //        //}
+        //    }
+        //    tempColorClassId = null;
+        //    return true;
+        //}
+
+        BoxView FindNearestEdgeToProcess(object sender, TouchActionEventArgs e)
         {
+            var shape = ((BoxView)sender);
+            if (shape.IsFilled())
+                return null;
+            if (shape.ClassId.StartsWith("house"))
+            {
+                var pressedLocation = e.Location;
+                var hs = shape.ClassId.Split('_');
+                int houseId = ((Convert.ToInt32(hs[1]) - 1) / 2) * count + (Convert.ToInt32(hs[2]) + 1) / 2;
+                var house = houseDict[houseId];
+                if (house.FilledCount < 3)
+                {
+                    var leftX = pressedLocation.X;
+                    var topY = pressedLocation.Y;
+                    var rightX = shape.Bounds.Width - leftX;
+                    var bottomY = shape.Bounds.Height - topY;
+
+                    var min = Math.Min(leftX, Math.Min(topY, Math.Min(rightX, bottomY)));
+                    if (min == leftX)
+                        shape = house.LeftEdge.Shape;
+                    else if (min == topY)
+                        shape = house.TopEdge.Shape;
+                    else if (min == rightX)
+                        shape = house.RightEdge.Shape;
+                    else
+                        shape = house.DownEdge.Shape;
+                    if (shape.IsFilled()) return null;
+                }
+            }
+            return shape;
+        }
+        async void EdgeClicked(object sender, TouchActionEventArgs e)
+        {
+            if (e.Type != TouchActionType.Released) return;
             try
             {
-                if (((BoxView)sender).IsFilled())
-                    return;
-
+                var shape = FindNearestEdgeToProcess(sender, e);
+                if (shape == null) return;
                 if (ClasicGameSetting.Is2Players || GetTurn() == Turn.Player1)
                 {
-                    var shape = ((BoxView)sender);
                     if (prevCompRect != null)
                         prevCompRect.BackgroundColor = Constants.compColor;
                     bool found = false;
@@ -312,7 +383,7 @@ namespace DotsAndBoxesFun.Views
             {
 
             }
-        }
+        }        
 
         protected Turn GetTurn()
         {

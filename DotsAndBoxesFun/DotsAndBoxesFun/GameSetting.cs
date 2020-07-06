@@ -112,7 +112,7 @@ namespace DotsAndBoxesFun
 
     public static class ChallengeGameSetting
     {
-        public static int BoardSize { get; } = 6;
+        public static int BoardSize { get; } = 5;
 
         private static int _challengeLevel = 1;
         public static int ChallengeLevel
